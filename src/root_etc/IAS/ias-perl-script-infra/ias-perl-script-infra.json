@@ -1,0 +1,11 @@
+{
+	"IAS::Infra::Logger": {
+		"log-debug-names": [
+			"debug-name-3",
+			"debug-name-2"
+		]
+	},
+	"IAS::ConfigAppTest":{
+		"config-option-project": "IAS::ConfigAppTest set in /etc/ (project)"
+	}
+}

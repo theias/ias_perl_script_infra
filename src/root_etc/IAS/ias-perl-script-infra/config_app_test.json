@@ -1,0 +1,13 @@
+{
+	"IAS::Infra::Logger": {
+		"log-devel": 1,
+		"log-debug-names": [
+			"root-etc-config-test1",
+			"debug-name-2"
+		]
+	},
+	"IAS::ConfigAppTest":{
+		"config-option-two": "IAS::ConfigAppTest variable set in root/etc (script)",
+		"config-option-three": "config option 3 set in json"
+	}
+}

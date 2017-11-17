@@ -1,0 +1,60 @@
+ias-perl-script-infra 1.6.0-0 noarch; urgency=low
+
+	* Make fixes, and moving to git.
+
+ -- Martin VanWinkle mvanwinkle@ias.edu  Fri, 17 Nov 2017 15:02:55 -0500
+
+ias-perl-script-infra 1.5.0-0 noarch; urgency=low
+
+	* Uses a more "distinct" library path so other languages can work well
+	* Makefile has been "standardized"
+
+ -- Martin VanWinkle mvanwinkle@ias.edu  Tue, 10 Oct 2017 20:02:24 -0400
+
+ias-perl-script-infra 1.4.0-2 noarch; urgency=low
+
+	* $self->get_assumed_user() added as $ENV{USER} is unreliable in, say, cron
+	* arguments to script now logged in JSON
+
+ -- Martin VanWinkle mvanwinkle@ias.edu  
+
+ias-perl-script-infra 1.4.0-0 noarch; urgency=low
+
+	* Changed output file stuff to use get_generic_output_file_path()
+		and get_generic_output_file_name()
+	
+ -- Martin VanWinkle mvanwinkle@ias.edu  Mon, 19 Jun 2017 10:44:39 -0400
+
+
+ias-perl-script-infra 1.3.1-0 noarch; urgency=low
+
+	* Changed --debug --log-debug
+	* Code uses { local ... } for get options pass through
+	* Documented bug about duplicate syslog entries
+	
+ -- Martin VanWinkle mvanwinkle@ias.edu  Mon, 19 Jun 2017 10:44:39 -0400
+
+ias-perl-script-infra 1.3.0-0 noarch; urgency=low
+
+	* Logging correctly now: syslog module doesn't accept arrays.
+	* Support for --start-time and --end-time
+	* Support for prompting for usernames and passwords
+	* More documentation
+
+ -- Martin VanWinkle mvanwinkle@ias.edu  Thu, 15 Jun 2017 16:23:00 -0400
+
+ias-perl-script-infra 1.2.0-0 noarch; urgency=low
+
+	* Support for overall project configs
+	* Support for ~/.config/IAS/project-name configs
+	* Support for /etc/IAS/project-name configs
+	* Support for /opt/IAS/etc/project_name
+
+ -- Martin VanWinkle mvanwinkle@ias.edu  Tue, 23 May 2017 10:04:55 -0400
+
+ias-perl-script-infra 1.0.0-0 noarch; urgency=low
+
+	* initial packaging stuff
+
+ -- Martin VanWinkle mvanwinkle@ias.edu  Fri, 07 Apr 2017 13:23:14 -0400
+

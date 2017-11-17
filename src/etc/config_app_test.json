@@ -1,0 +1,13 @@
+{
+	"IAS::Infra::Logger": {
+		"log-devel": 1,
+		"log-debug-names": [
+			"debug-name-1",
+			"debug-name-2"
+		]
+	},
+	"IAS::ConfigAppTest":{
+		"config-option-two": "config option 2 set in json",
+		"config-option-three": "config option 3 set in json"
+	}
+}

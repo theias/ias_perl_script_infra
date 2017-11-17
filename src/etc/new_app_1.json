@@ -1,0 +1,12 @@
+{
+	"IAS::Infra::Logger": {
+		"log-devel": 1,
+		"log-debug-names": [
+			"debug-name-1",
+			"debug-name-2"
+		]
+	},
+	"IAS::NewApp1":{
+		"greeting": "Greetings,"
+	}
+}

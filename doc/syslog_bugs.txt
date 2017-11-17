@@ -1,0 +1,40 @@
+Source:
+https://unix.stackexchange.com/questions/196877/rsyslog-logger-message-duplicated
+
+I just had a problem with rsyslog's imjournal module, possibly the issue described here, whereby complications with systemd's journal cause
+
+the journal to return the same data endlessly in a tight loop. This results in massive message duplication inside rsyslog probably resulting in a denial-of-service when the system resouces get exhausted
+In any case, it did indeed max the processor out repeating messages that were months old. I did not realize that rsyslog and journald were so tightly coupled by default, so I reconfigured the former to use a more traditional, more efficient live socket for input as per these instructions:
+
+$ModLoad imuxsock
+$OmitLocalLogging off
+This seems to work in so far as the socket is created and in use. However, I then noticed a strange thing when testing it.
+
+> logger "hello world"
+Results in this in /var/log/syslog, which is mentioned only once in rsyslog.conf:
+
+Apr 17 10:35:45 pidora logger: hello world
+Apr 17 10:35:45 pidora logger: hello world
+The message is repeated, and it would seem that all the other messages are as well. Some of them are exactly the same, and some of them differ in only one aspect:
+
+Apr 17 10:42:26 pidora systemd[1]: Stopping System Time Synchronized.
+Apr 17 10:42:26 pidora systemd: Stopping System Time Synchronized.
+The [1] is a pid. I believe what's going on is rsyslog is getting the message once from the application and then again from journald.
+
+This is kind of silly. How can I stop it?
+
+asked Apr 17 '15 at 15:15
+goldilocks
+
+I believe what's going on is rsyslog is getting the message once from the application and then again from journald.
+Yep. The solution is to include this in /etc/systemd/journald.conf:
+
+	ForwardToSyslog=no
+
+Why there wasn't this problem when using imjournal I'm not sure, but there is a hint in man journald.conf:
+
+ForwardToSyslog=
+
+	[...] the journal daemon shall be forwarded to a traditional syslog daemon [...] If forwarding to syslog is enabled but no syslog daemon is running, the respective option has no effect
+
+I'm guessing what's actually meant by a "syslog daemon running" is the literal presence of a traditional syslog socket.
