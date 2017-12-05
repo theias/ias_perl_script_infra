@@ -31,8 +31,7 @@ IAS::Infra::FullProjectPaths
 =head1 DESCRIPTION
 
 This path module provides is some ways of sensibly figuring out
-where files should go based off of whether or not you're in development
-or production.
+where files should go based off of whether or not you're in a source tree or not.
 
 A typical development source tree might look like this:
 
@@ -82,7 +81,7 @@ where "output/" is checked in to the repo, but everything under it is ignored.
 
 This allows you to check out your project and just get working.
 
-In production, we'd probably deploy to something like this:
+Outside of a source tree, we'd probably deploy to something like this:
 
   /opt/IAS/bin/package-name/script.pl
 
@@ -97,11 +96,11 @@ Which we want our script to output things to (relative):
 
   [ --input-dir ]
 
-In dev, sets input file path to:
+In src, sets input file path to:
 
   ../input/
 
-In prod, sets input file path to:
+"installed", sets input file path to:
 
   ../../input/package-name
 
@@ -149,9 +148,9 @@ Which will be installed to:
 
 =over 4
 
-=item * ../../etc/project-name/script_name.json (prod)
+=item * ../../etc/project-name/script_name.json ("installed")
 
-=item * ../../etc/project-name/project-name.json (prod)
+=item * ../../etc/project-name/project-name.json ("installed")
 
 =back
 
@@ -173,9 +172,9 @@ Which will be installed to:
 
 =over 4
 
-=item * /etc/IAS/project-name/script_name.json (prod)
+=item * /etc/IAS/project-name/script_name.json ("installed")
 
-=item * /etc/IAS/project-name/project-name.json (prod)
+=item * /etc/IAS/project-name/project-name.json ("installed")
 
 =back 
 
@@ -298,8 +297,9 @@ $PROJECT_NAME = $SCRIPT_PATH_PARTS[-1];
 );
 
 
-	# Test if we're in a "dev" environment; scripts shouldn't be "deployed"
-	# in production to a directory called 'src'
+	# Test if we're in a "src" environment; chances are we're not installed
+	# with a package.
+
 
 if($SCRIPT_PATH_PARTS[-2] eq 'src')
 {
