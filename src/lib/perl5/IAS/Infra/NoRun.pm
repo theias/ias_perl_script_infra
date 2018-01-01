@@ -2,6 +2,37 @@
 
 package IAS::Infra::NoRun;
 
+=pod
+
+=head1 NAME
+
+IAS::Infra::NoRun
+
+=head1 SYNOPSIS
+
+This module searches through a list of configuration directories ($self->get_all_config_dirs())
+for files named NORUN, or for files named (where if the current script is
+script_name.pl) script_name-NORUN
+
+Scripts call $self->should_i_run() to determine if they should run.
+
+=head1 OPTIONS
+
+=over 4
+
+=item * --dont-run - should_i_run() always returns 0
+
+=item * --ignore-norun - should_i_run() will return 1 unless --dont-run is specified.
+
+=item * --norun-filename - If you decide to call your NORUN file something different, say 'DONT-RUN' ,
+the module will look for DONT-RUN and script_name-DONT-RUN.
+
+=item * --debug-norun - Verbose debugging for this module via log_debug();
+
+=back
+
+=cut
+
 use strict;
 use warnings;
 
