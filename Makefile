@@ -1,18 +1,31 @@
 PROJECT_NAME = ias-perl-script-infra
-RELEASE_VERSION := $(shell cat ./$(PROJECT_NAME)/changelog | grep -v '^\s+$$' | head -n 1 | awk '{print $$2}')
-ARCH := $(shell cat ./$(PROJECT_NAME)/changelog | egrep -v '^\s*$$' | head -n 1 | awk '{print $$3}'|sed 's/;//')
+
+BASE_DIR = /opt/IAS
+
+SHELL_PWD = $(shell echo `pwd`)
+MAKEFILE_PATH = $(strip $(dir $(realpath $(firstword $(MAKEFILE_LIST)))))
+
+PROJECT_DIR = $(MAKEFILE_PATH)
+SCRATCH_AREA = $(SHELL_PWD)
+
+# PROJECT_DIR = $(SHELL_PWD)
+
+CHANGELOG_FILE = $(PROJECT_DIR)/$(PROJECT_NAME)/changelog
+
+RELEASE_VERSION := $(shell cat '$(CHANGELOG_FILE)' | grep -v '^\s+$$' | head -n 1 | awk '{print $$2}')
+ARCH := $(shell cat $(CHANGELOG_FILE) | grep -v '^\s+$$' | head -n 1 | awk '{print $$3}'|sed 's/;//')
 SRC_VERSION := $(shell echo '$(RELEASE_VERSION)' | awk -F '-' '{print $$1}')
 PKG_VERSION := $(shell echo '$(RELEASE_VERSION)' | awk -F '-' '{print $$2}')
 
-DROP_DIR = $(shell echo `pwd`/drop)
-SRC_DIR = $(shell echo `pwd`/src)
-BUILD_DIR = $(shell echo `pwd`/build)
+SRC_DIR = $(PROJECT_DIR)/src
+
+DROP_DIR = $(SCRATCH_AREA)/drop
+BUILD_DIR = $(SCRATCH_AREA)/build
 SPEC_FILE_NAME = $(PROJECT_NAME)-$(RELEASE_VERSION)--pkginfo.spec
 SPEC_FILE = $(BUILD_DIR)/$(SPEC_FILE_NAME)
 ROOT_DIR = $(BUILD_DIR)/root
-BASE_DIR = /opt/IAS
+
 INST_DIR = $(BASE_DIR)/$(PROJECT_NAME)
-FAKE_INST_DIR = $(ROOT_DIR)$(INST_DIR)
 
 BIN_DIR=$(BASE_DIR)/bin/$(PROJECT_NAME)
 BIN_INST_DIR=$(ROOT_DIR)/$(BIN_DIR)
@@ -26,12 +39,15 @@ LIB_INST_DIR=$(ROOT_DIR)/$(LIB_DIR)
 DOC_DIR=$(BASE_DIR)/doc/$(PROJECT_NAME)
 DOC_INST_DIR=$(ROOT_DIR)$(DOC_DIR)
 
+TEMPLATE_DIR=$(BASE_DIR)/templates/$(PROJECT_NAME)
+TEMPLATE_INST_DIR=$(ROOT_DIR)/$(TEMPLATE_DIR)
+
 # Directories for FullProjectPath type apps:
 INPUT_DIR=$(BASE_DIR)/input/$(PROJECT_NAME)
 OUTPUT_DIR=$(BASE_DIR)/output/$(PROJECT_NAME)
 CONF_DIR=$(BASE_DIR)/etc/$(PROJECT_NAME)
 LOG_DIR=$(BASE_DIR)/log/$(PROJECT_NAME)
-TEMPLATE_DIR=$(BASE_DIR)/templates/$(PROJECT_NAME)
+
 
 DEB_DIR=$(ROOT_DIR)/DEBIAN
 DEB_CONTROL_FILE=$(DEB_DIR)/control
@@ -46,63 +62,68 @@ clean:
 	-rm -rf build
 
 debug:
-	# PROJECT_NAME: $(PROJECT_NAME)
-	# RELEASE_VERSION: $(RELEASE_VERSION)
-	# ARCH: $(ARCH)
-	# SRC_VERSION: $(SRC_VERSION)
-	# PKG_VERSION: $(PKG_VERSION)
-	# DROP_DIR: $(DROP_DIR)
-	# BUILD_DIR: $(BUILD_DIR)
-	# SPEC_FILE_NAME: $(SPEC_FILE_NAME)
-	# SPEC_FILE: $(SPEC_FILE)
-	# SRC_DIR: $(SRC_DIR)
-	# ROOT_DIR: $(ROOT_DIR)
-	# BASE_DIR: $(BASE_DIR)
-	# INST_DIR: $(INST_DIR)
-	# FAKE_INST_DIR: $(FAKE_INST_DIR)
-
-	# BIN_DIR: $(BIN_DIR)
-	# BIN_INST_DIR: $(BIN_INST_DIR)
-
-	# CGI_BIN_DIR: $(CGI_BIN_DIR)
-	# CGI_BIN_INST_DIR: $(CGI_BIN_INST_DIR)
-
-	# LIB_DIR: $(LIB_DIR)
-	# LIB_INST_DIR: $(LIB_INST_DIR)
+	# PROJECT_NAME: '$(PROJECT_NAME)'
+	# MAKEFILE_PATH: '$(MAKEFILE_PATH)'
+	# CHANGELOG_FILE: '$(CHANGELOG_FILE)'
+	# RELEASE_VERSION: '$(RELEASE_VERSION)'
+	# ARCH: '$(ARCH)'
+	# SRC_VERSION: '$(SRC_VERSION)'
+	# PKG_VERSION: '$(PKG_VERSION)'
+	# SHELL_PWD: '$(SHELL_PWD)'
+	# PROJECT_DIR: '$(PROJECT_DIR)'
+	# DROP_DIR: '$(DROP_DIR)'
+	# BUILD_DIR: '$(BUILD_DIR)'
+	# SPEC_FILE_NAME: '$(SPEC_FILE_NAME)'
+	# SPEC_FILE: '$(SPEC_FILE)'
+	# SRC_DIR: '$(SRC_DIR)'
+	# ROOT_DIR: '$(ROOT_DIR)'
+	# BASE_DIR: '$(BASE_DIR)'
+	# INST_DIR: '$(INST_DIR)'
 	
-	# DOC_DIR: $(DOC_DIR)
-	# DOC_INST_DIR: $(DOC_INST_DIR)
+	# BIN_DIR: '$(BIN_DIR)'
+	# BIN_INST_DIR: '$(BIN_INST_DIR)'
 
-	# INPUT_DIR: $(INPUT_DIR)
-	# OUTPUT_DIR: $(OUTPUT_DIR)
-	# CONF_DIR: $(CONF_DIR)
-	# LOG_DIR: $(LOG_DIR)
-	# TEMPLATE_DIR $(TEMPLATE_DIR)
+	# CGI_BIN_DIR: '$(CGI_BIN_DIR)'
+	# CGI_BIN_INST_DIR: '$(CGI_BIN_INST_DIR)'
+
+	# LIB_DIR: '$(LIB_DIR)'
+	# LIB_INST_DIR: '$(LIB_INST_DIR)'
+	
+	# DOC_DIR: '$(DOC_DIR)'
+	# DOC_INST_DIR: '$(DOC_INST_DIR)'
+
+	# INPUT_DIR: '$(INPUT_DIR)'
+	# OUTPUT_DIR: '$(OUTPUT_DIR)'
+	# CONF_DIR: '$(CONF_DIR)'
+	# LOG_DIR: '$(LOG_DIR)'
+	# TEMPLATE_DIR '$(TEMPLATE_DIR)'
 
 	
 builddir:
 	if [ ! -d build ]; then mkdir build; fi;
 
-install: builddir
-	################
-	# Simplest form: all things from src get copied
-	# into the installation directory
-	# mkdir -p $(FAKE_INST_DIR)
-	# cp -r $(SRC_DIR)/* $(FAKE_INST_DIR)/
-	# -find $(FAKE_INST_DIR) -name '*.pl' | xargs -r chmod 755
-	# -find $(FAKE_INST_DIR) -name '*.sh' | xargs -r chmod 755
-	# -find $(FAKE_INST_DIR) -name '*.py' | xargs -r chmod 755
+self-replicate: install
+	# Self Replicating
+	# This will put a copy of the source tree in a tar.gz file
+	# in the doc dir.
 	
-	###############
-	# Slightly more complicated:
-	# Stuff is divided up
+	ls | egrep -v '(build|\.svn)' | \
+		xargs -n1 -i cp -r {} ./build/$(PROJECT_NAME)-$(RELEASE_VERSION)/
+	
+	cd build && tar czvf $(PROJECT_NAME)-$(RELEASE_VERSION).tar.gz \
+		$(PROJECT_NAME)-$(RELEASE_VERSION)
+	
+	mv build/$(PROJECT_NAME)-$(RELEASE_VERSION).tar.gz $(DOC_INST_DIR)/
 
-# Docs by default are added.
+
+install: builddir
+
+	# META-Docs by default are added.
+	
 	mkdir -p $(DOC_INST_DIR)
 	cp $(PROJECT_NAME)/changelog $(DOC_INST_DIR)/
 	cp $(PROJECT_NAME)/description $(DOC_INST_DIR)/
 	cp README* $(DOC_INST_DIR)
-	-cp -r run_scripts $(DOC_INST_DIR)
 	find $(DOC_INST_DIR) -type f | xargs chmod 644
 
 	# Directories for FullProjectPath type apps:
@@ -111,47 +132,60 @@ install: builddir
 	mkdir -p $(ROOT_DIR)/$(OUTPUT_DIR)
 	mkdir -p $(ROOT_DIR)/$(LOG_DIR)
 
+
 # Conditional additions
 
-# Bin
-ifneq ("$(wildcard $(SRC_DIR)/bin/*)","") 
-		mkdir -p $(ROOT_DIR)/$(BIN_DIR)
-		-cp -r $(SRC_DIR)/bin/* $(ROOT_DIR)/$(BIN_DIR)
-		-find $(BIN_INST_DIR) -type f | xargs -r chmod 755
+ifneq ("$(wildcard $(SRC_DIR)/run_scripts/*)","")
+	# Installing run scripts
+	cp -r $(SRC_DIR)/run_scripts $(DOC_INST_DIR)/run_scripts
+
 endif
 
-# cgi-bin
+ifneq ("$(wildcard $(PROJECT_DIR)/doc/*)","") 
+	# Installing more documentation
+	mkdir -p $(DOC_INST_DIR)
+	cp -r $(PROJECT_DIR)/doc $(DOC_INST_DIR)/doc
+	find $(DOC_INST_DIR) -type f | xargs -r chmod 644
+endif
+
+ifneq ("$(wildcard $(SRC_DIR)/bin/*)","") 
+	# Installing binaries.
+	mkdir -p $(ROOT_DIR)/$(BIN_DIR)
+	cp -r $(SRC_DIR)/bin/* $(ROOT_DIR)/$(BIN_DIR)
+	find $(BIN_INST_DIR) -type f | xargs -r chmod 755
+endif
+
 ifneq ("$(wildcard $(SRC_DIR)/cgi-bin/*)","") 
-		mkdir -p $(ROOT_DIR)/$(CGI_BIN_DIR)
-		-cp -r $(SRC_DIR)/cgi-bin/* $(ROOT_DIR)/$(CGI_BIN_DIR)
-		-find $(CGI_BIN_INST_DIR) -type f | xargs -r chmod 755
+	# Installing CGI-BIN files
+	mkdir -p $(ROOT_DIR)/$(CGI_BIN_DIR)
+	-cp -r $(SRC_DIR)/cgi-bin/* $(ROOT_DIR)/$(CGI_BIN_DIR)
+	-find $(CGI_BIN_INST_DIR) -type f | xargs -r chmod 755
 endif
 	
-# Templates
 ifneq ("$(wildcard $(SRC_DIR)/templates/*)","") 
-	mkdir -p $(ROOT_DIR)/$(BASE_DIR)/templates
-	cp -r $(SRC_DIR)/templates $(ROOT_DIR)/$(TEMPLATE_DIR)
-	find $(ROOT_DIR)/$(TEMPLATE_DIR) -type f | xargs -r chmod 644
+	# Installing Templates
+	mkdir -p $(TEMPLATE_INST_DIR)
+	cp -r $(SRC_DIR)/templates $(TEMPLATE_INST_DIR)
+	find $(TEMPLATE_INST_DIR) -type f | xargs -r chmod 644
 endif
-
 
 # lib
 ifneq ("$(wildcard $(SRC_DIR)/lib/*)","")	
+	# Installing libraries
 	mkdir -p $(LIB_INST_DIR)
 	cp -r $(SRC_DIR)/lib/* $(LIB_INST_DIR)
 	find $(SRC_DIR)/lib/ | xargs -r chmod 644
 endif
 
-
-# /opt/IAS/(something)/etc
 ifneq ("$(wildcard $(SRC_DIR)/etc/*)","")
+	# Installing project directory configuration
 	mkdir -p $(ROOT_DIR)/$(CONF_DIR)
 	cp -r $(SRC_DIR)/etc/* $(ROOT_DIR)/$(CONF_DIR)/
 	chmod 0644 $(ROOT_DIR)/$(CONF_DIR)
 endif
 
-# /etc/
 ifneq ("$(wildcard $(SRC_DIR)/root_etc/*)","")
+	# Installing things to /etc
 	cp -r $(SRC_DIR)/root_etc $(ROOT_DIR)/etc
 	chmod -R 0644 $(ROOT_DIR)/etc
 endif
