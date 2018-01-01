@@ -219,6 +219,7 @@ my $previous_pass_through;
 		'log-dir=s',
 		'output-dir=s',
 		'input-dir=s',
+		'template-dir=s',
 
 		'json-script-config-name=s',
 		'json-project-config-name=s',
@@ -343,6 +344,7 @@ sub debug_paths
 	$self->log_debug('Log dir: ', $self->log_dir());
 	$self->log_debug('Output dir: ', $self->output_dir());
 	$self->log_debug('Input dir: ', $self->input_dir());
+	$self->log_debug('Template dir: ', $self->template_dir());
 
 	$self->log_debug('Home Conf dir: ', $self->home_conf_dir());
 	$self->log_debug('Root conf dir: ', $self->root_conf_dir());
@@ -403,6 +405,14 @@ sub bin_dir
 	return $OPTIONS->{'bin-dir'}
 		|| $CHOSEN_BIN;
 }
+
+sub template_dir
+{
+	my ($self) = @_;
+	return $OPTIONS->{'template-dir'}
+		|| join('/', @UP_PATH_COMPONENTS, 'templates',@POST_PATH_COMPONENTS);
+}
+
 
 sub log_dir
 {
