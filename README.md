@@ -1,4 +1,6 @@
-# ias_package_shell
+# ias_perl_script_infra
+
+A collection of Perl modules which adhere to a set of standards.
 
 # Supplemental Documentation
 
@@ -19,10 +21,7 @@ rpm_specific (rpm systems), or deb_control (deb systems) and run it.
 
 ## Building a Package
 
-You can build a package and install it, which will take care of the dependencies and install into:
-
-* /opt/IAS/bin/ias-package-shell/package_shell.pl
-
+You can build a package and install it, which will take care of the dependencies.
 
 ### Requirements
 
