@@ -62,24 +62,34 @@ sub run
 	$self->log_start_log($SVN_VERSION);
 
 	$self->load_config();	
+	IAS::Infra::NoRun::apply_options_precedence({});
 
-	IAS::Infra::Logger::apply_options_precedence({});
-	IAS::Infra::Hooks::apply_options_precedence({});
-	IAS::Infra::FullProjectPaths::apply_options_precedence({});
-	IAS::Infra::Config::apply_options_precedence({});
-	
-	$self->setup()
-		if ($self->can('setup'));
-	
-	$self->init()
-		if ($self->can('init'));
-	
-	$self->main();
-	my $end_time = time;
+	if (! $self->should_i_run())
+	{
+		$self->log_info('I should not run.  Reason: '.$self->get_norun_reason());
+		
+	}
 
-	$self->tear_down()
-		if ($self->can('tear_down'));
+	else
+	{
+		IAS::Infra::Logger::apply_options_precedence({});
+		IAS::Infra::Hooks::apply_options_precedence({});
+		IAS::Infra::FullProjectPaths::apply_options_precedence({});
+		IAS::Infra::Config::apply_options_precedence({});
+	
+		$self->setup()
+			if ($self->can('setup'));
+	
+		$self->init()
+			if ($self->can('init'));
+	
+		$self->main();
 
+		my $end_time = time;
+
+		$self->tear_down()
+			if ($self->can('tear_down'));
+	}
 	$self->write_exit_log();
 	
 }

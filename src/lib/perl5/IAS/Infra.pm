@@ -89,6 +89,7 @@ use base 'IAS::Infra::FullProjectPaths';
 use base 'IAS::Infra::TimeTravel';
 use base 'IAS::Infra::Config';
 use base 'IAS::Infra::SimplePrompts';
+use base 'IAS::Infra::NoRun';
 
 sub new
 {

@@ -507,6 +507,17 @@ sub root_json_project_config_file_name
 	return join('/', $self->root_conf_dir(), $json_file);
 }
 
+sub get_all_config_dirs
+{
+	my ($self) = @_;
+	
+	return [
+		$self->conf_dir(),
+		$self->home_conf_dir(),
+		$self->root_conf_dir(),
+	];
+}
+
 sub json_project_config_file_name
 {
 	# This is sloppy
