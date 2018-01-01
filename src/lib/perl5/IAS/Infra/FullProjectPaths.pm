@@ -33,15 +33,15 @@ IAS::Infra::FullProjectPaths
 This path module provides is some ways of sensibly figuring out
 where files should go based off of whether or not you're in a source tree or not.
 
-A typical development source tree might look like this:
+A typical source tree might look like this:
 
   project_name/src/bin/script_name.pl
 
 A split on the directories would look like this:
   ( "project_name" , "src", "bin" )
 
-If the path at [-2] in the array is "src", we guess that we're in development mode
-and set our default path mode to dev.
+If the path at [-2] in the array is "src", we guess that we're in a source tree
+and look set our paths accordingly.
 
 Provided that decision isn't overrided by either configuration or command line
 options we can begin to figure out where files should go or be found; sometimes
