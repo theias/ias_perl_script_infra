@@ -16,8 +16,10 @@ IAS::Infra::Logger
   # Enable debugging output in the logs	
   --log-debug
   
-  # Copy all log messages to std{watever}
+  # Copy "error" messages to stderr
   --log-stderr # Defaults to on
+
+  # Copy all log messages to stdout (useful for debugging)
   --log-stdout
   
   # Copy log notices to std{whatever}

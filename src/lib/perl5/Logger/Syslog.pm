@@ -40,7 +40,7 @@ the syslog socket can happen in mod_perl env).
     }
     ...
     notice("There something to notify");
-     
+
 =cut
 
 BEGIN {
@@ -135,7 +135,7 @@ That function lets you set a string that will be prefixed to every
 messages sent to syslog.
 
 Example:
-  
+
     logger_prefix("my program");
     info("starting");
     ...

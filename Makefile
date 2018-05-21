@@ -79,7 +79,6 @@ debug:
 	# LOG_DIR: $(LOG_DIR)
 	# TEMPLATE_DIR $(TEMPLATE_DIR)
 
-	
 builddir:
 	if [ ! -d build ]; then mkdir build; fi;
 

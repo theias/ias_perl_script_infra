@@ -3,6 +3,18 @@
 use strict;
 use warnings;
 
+=pod
+
+=head1 NAME
+
+merge_test
+
+=head1 DESCRIPTION
+
+Tests the merging of data structures.
+
+=cut
+
 use Data::Dumper;
 
 use Hash::Merge::Simple;
