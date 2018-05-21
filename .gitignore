@@ -1,0 +1,7 @@
+build
+
+drop/*
+
+src/input/*
+src/output/*
+
