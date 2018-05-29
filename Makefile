@@ -44,24 +44,10 @@ DOC_INST_DIR=$(ROOT_DIR)$(DOC_DIR)
 TEMPLATE_DIR=$(BASE_DIR)/templates/$(ARTIFACT_NAME)
 TEMPLATE_INST_DIR=$(ROOT_DIR)/$(TEMPLATE_DIR)
 
-# Directories for FullProjectPath type apps:
-INPUT_BASE_DIR=$(BASE_DIR)/input
-OUTPUT_BASE_DIR=$(BASE_DIR)/output
-CONF_BASE_DIR=$(BASE_DIR)/etc
-LOG_BASE_DIR=$(BASE_DIR)/log
 
 
-INPUT_DIR=$(INPUT_BASE_DIR)/$(ARTIFACT_NAME)
-OUTPUT_DIR=$(OUTPUT_BASE_DIR)/$(ARTIFACT_NAME)
-CONF_DIR=$(CONF_BASE_DIR)/$(ARTIFACT_NAME)
-LOG_DIR=$(LOG_BASE_DIR)/$(ARTIFACT_NAME)
 
-
-DEB_DIR=$(ROOT_DIR)/DEBIAN
-DEB_CONTROL_FILE=$(DEB_DIR)/control
-DEB_CONF_FILES_FILE=$(DEB_DIR)/conffiles
-
-
+include $(MAKEFILE_PATH)/package_shell/make/project_directories-full_project.gmk
 
 include $(MAKEFILE_PATH)/package_shell/make/make-debug.gmk
 

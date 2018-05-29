@@ -1,3 +1,7 @@
+DEB_DIR=$(ROOT_DIR)/DEBIAN
+DEB_CONTROL_FILE=$(DEB_DIR)/control
+DEB_CONF_FILES_FILE=$(DEB_DIR)/conffiles
+
 debsetup:
 	mkdir -p $(DEB_DIR)
 	echo "Package: " $(ARTIFACT_NAME) >> $(DEB_CONTROL_FILE)
