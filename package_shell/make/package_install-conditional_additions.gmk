@@ -1,8 +1,8 @@
-.PHONY: package_install_conditional_additions
+.PHONY: package_install-conditional_additions
 
 # Conditional additions
 
-package_install_conditional_additions: package_install_base_directories
+package_install-conditional_additions: package_install-base_directories
 
 ifneq ("$(wildcard $(SRC_DIR)/run_scripts/*)","")
 	# Installing run scripts
