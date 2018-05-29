@@ -1,4 +1,4 @@
-PROJECT_NAME = ias-perl-script-infra
+ARTIFACT_NAME = ias-perl-script-infra
 
 BASE_DIR = /opt/IAS
 
@@ -10,7 +10,7 @@ SCRATCH_AREA = $(SHELL_PWD)
 
 # PROJECT_DIR = $(SHELL_PWD)
 
-CHANGELOG_FILE = $(PROJECT_DIR)/$(PROJECT_NAME)/changelog
+CHANGELOG_FILE = $(PROJECT_DIR)/$(ARTIFACT_NAME)/changelog
 
 RELEASE_VERSION := $(shell cat '$(CHANGELOG_FILE)' | grep -v '^\s+$$' | head -n 1 | awk '{print $$2}')
 ARCH := $(shell cat $(CHANGELOG_FILE) | grep -v '^\s+$$' | head -n 1 | awk '{print $$3}'|sed 's/;//')
@@ -21,26 +21,26 @@ SRC_DIR = $(PROJECT_DIR)/src
 
 DROP_DIR = $(SCRATCH_AREA)/drop
 BUILD_DIR = $(SCRATCH_AREA)/build
-SPEC_FILE_NAME = $(PROJECT_NAME)-$(RELEASE_VERSION)--pkginfo.spec
+SPEC_FILE_NAME = $(ARTIFACT_NAME)-$(RELEASE_VERSION)--pkginfo.spec
 SPEC_FILE = $(BUILD_DIR)/$(SPEC_FILE_NAME)
 ROOT_DIR = $(BUILD_DIR)/root
 
-INST_DIR = $(BASE_DIR)/$(PROJECT_NAME)
+INST_DIR = $(BASE_DIR)/$(ARTIFACT_NAME)
 
-BIN_DIR=$(BASE_DIR)/bin/$(PROJECT_NAME)
+BIN_DIR=$(BASE_DIR)/bin/$(ARTIFACT_NAME)
 BIN_INST_DIR=$(ROOT_DIR)/$(BIN_DIR)
 
-CGI_BIN_DIR=$(BASE_DIR)/cgi-bin/$(PROJECT_NAME)
+CGI_BIN_DIR=$(BASE_DIR)/cgi-bin/$(ARTIFACT_NAME)
 CGI_BIN_INST_DIR=$(ROOT_DIR)/$(CGI_BIN_DIR)
 
 LIB_DIR=$(BASE_DIR)/lib
 LIB_INST_DIR=$(ROOT_DIR)/$(LIB_DIR)
 
 DOC_BASE_DIR=$(BASE_DIR)/doc
-DOC_DIR=$(DOC_BASE_DIR)/$(PROJECT_NAME)
+DOC_DIR=$(DOC_BASE_DIR)/$(ARTIFACT_NAME)
 DOC_INST_DIR=$(ROOT_DIR)$(DOC_DIR)
 
-TEMPLATE_DIR=$(BASE_DIR)/templates/$(PROJECT_NAME)
+TEMPLATE_DIR=$(BASE_DIR)/templates/$(ARTIFACT_NAME)
 TEMPLATE_INST_DIR=$(ROOT_DIR)/$(TEMPLATE_DIR)
 
 # Directories for FullProjectPath type apps:
@@ -50,17 +50,17 @@ CONF_BASE_DIR=$(BASE_DIR)/etc
 LOG_BASE_DIR=$(BASE_DIR)/log
 
 
-INPUT_DIR=$(INPUT_BASE_DIR)/$(PROJECT_NAME)
-OUTPUT_DIR=$(OUTPUT_BASE_DIR)/$(PROJECT_NAME)
-CONF_DIR=$(CONF_BASE_DIR)/$(PROJECT_NAME)
-LOG_DIR=$(LOG_BASE_DIR)/$(PROJECT_NAME)
+INPUT_DIR=$(INPUT_BASE_DIR)/$(ARTIFACT_NAME)
+OUTPUT_DIR=$(OUTPUT_BASE_DIR)/$(ARTIFACT_NAME)
+CONF_DIR=$(CONF_BASE_DIR)/$(ARTIFACT_NAME)
+LOG_DIR=$(LOG_BASE_DIR)/$(ARTIFACT_NAME)
 
 
 DEB_DIR=$(ROOT_DIR)/DEBIAN
 DEB_CONTROL_FILE=$(DEB_DIR)/control
 DEB_CONF_FILES_FILE=$(DEB_DIR)/conffiles
 
-SUMMARY := $(shell egrep '^Summary:' ./$(PROJECT_NAME)/rpm_specific | awk -F ':' '{print $$2}')
+SUMMARY := $(shell egrep '^Summary:' ./$(ARTIFACT_NAME)/rpm_specific | awk -F ':' '{print $$2}')
 
 
 all:
@@ -69,7 +69,7 @@ clean:
 	-rm -rf build
 
 debug:
-	# PROJECT_NAME: '$(PROJECT_NAME)'
+	# ARTIFACT_NAME: '$(ARTIFACT_NAME)'
 	# MAKEFILE_PATH: '$(MAKEFILE_PATH)'
 	# CHANGELOG_FILE: '$(CHANGELOG_FILE)'
 	# RELEASE_VERSION: '$(RELEASE_VERSION)'
@@ -161,12 +161,12 @@ self-replicate: install
 	# in the doc dir.
 	
 	ls | egrep -v '(build|\.svn)' | \
-		xargs -n1 -i cp -r {} ./build/$(PROJECT_NAME)-$(RELEASE_VERSION)/
+		xargs -n1 -i cp -r {} ./build/$(ARTIFACT_NAME)-$(RELEASE_VERSION)/
 	
-	cd build && tar czvf $(PROJECT_NAME)-$(RELEASE_VERSION).tar.gz \
-		$(PROJECT_NAME)-$(RELEASE_VERSION)
+	cd build && tar czvf $(ARTIFACT_NAME)-$(RELEASE_VERSION).tar.gz \
+		$(ARTIFACT_NAME)-$(RELEASE_VERSION)
 	
-	mv build/$(PROJECT_NAME)-$(RELEASE_VERSION).tar.gz $(DOC_INST_DIR)/
+	mv build/$(ARTIFACT_NAME)-$(RELEASE_VERSION).tar.gz $(DOC_INST_DIR)/
 
 
 include $(MAKEFILE_PATH)/package_shell/make/package_install-conditional_additions.gmk
@@ -176,18 +176,18 @@ include $(MAKEFILE_PATH)/package_shell/make/package_install-conditional_addition
 
 rpmspec: install
 	echo "" > $(SPEC_FILE)
-	echo "Name: $(PROJECT_NAME)" >> $(SPEC_FILE)
+	echo "Name: $(ARTIFACT_NAME)" >> $(SPEC_FILE)
 	echo "Version: $(SRC_VERSION)" >> $(SPEC_FILE)
 	echo "Release: $(PKG_VERSION)" >> $(SPEC_FILE)
 	echo "BuildArch: $(ARCH)" >> $(SPEC_FILE)
 	echo `svn info |grep '^URL:'` >> $(SPEC_FILE)
 	echo "Packager: $$USER" >> $(SPEC_FILE)
 	
-	# cat ./$(PROJECT_NAME)/pkginfo >> $(SPEC_FILE)
-	cat ./$(PROJECT_NAME)/rpm_specific >> $(SPEC_FILE)
-	for file in $(PROJECT_NAME)/install_scripts/*; do echo "%"`basename $$file` >> $(SPEC_FILE); cat $$file >> $(SPEC_FILE); done
+	# cat ./$(ARTIFACT_NAME)/pkginfo >> $(SPEC_FILE)
+	cat ./$(ARTIFACT_NAME)/rpm_specific >> $(SPEC_FILE)
+	for file in $(ARTIFACT_NAME)/install_scripts/*; do echo "%"`basename $$file` >> $(SPEC_FILE); cat $$file >> $(SPEC_FILE); done
 	echo "%description" >> $(SPEC_FILE)
-	cat ./$(PROJECT_NAME)/description >> $(SPEC_FILE)
+	cat ./$(ARTIFACT_NAME)/description >> $(SPEC_FILE)
 	echo "" >> $(SPEC_FILE)
 
 	echo "%files" >> $(SPEC_FILE)
@@ -243,19 +243,19 @@ endif
 
 
 cp-rpmspec: builddir
-	cp $(PROJECT_NAME)/$(SPEC_FILE_NAME) $(SPEC_FILE)
+	cp $(ARTIFACT_NAME)/$(SPEC_FILE_NAME) $(SPEC_FILE)
 
 rpmbuild:
 	rpmbuild --buildroot $(ROOT_DIR) -bb $(SPEC_FILE) --define '_topdir $(BUILD_DIR)' --define '_rpmtopdir $(BUILD_DIR)'
 	
 debsetup:
 	mkdir -p $(DEB_DIR)
-	echo "Package: " $(PROJECT_NAME) >> $(DEB_CONTROL_FILE)
+	echo "Package: " $(ARTIFACT_NAME) >> $(DEB_CONTROL_FILE)
 	echo "Version: " $(RELEASE_VERSION) >> $(DEB_CONTROL_FILE)
-	cat $(PROJECT_NAME)/deb_control >> $(DEB_CONTROL_FILE)
+	cat $(ARTIFACT_NAME)/deb_control >> $(DEB_CONTROL_FILE)
 	
 	echo "Description: " $(SUMMARY) >> $(DEB_CONTROL_FILE)
-	cat ./$(PROJECT_NAME)/description | egrep -v '^\s*$$' | sed 's/^/ /' >> $(DEB_CONTROL_FILE)
+	cat ./$(ARTIFACT_NAME)/description | egrep -v '^\s*$$' | sed 's/^/ /' >> $(DEB_CONTROL_FILE)
 
 # Project Config, example /opt/IAS/etc/(project-name)
 ifneq ("$(wildcard $(SRC_DIR)/etc/*)","")

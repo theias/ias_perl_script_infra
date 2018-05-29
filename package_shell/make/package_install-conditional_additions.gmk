@@ -14,8 +14,8 @@ package_install_base_directories:
 	
 	mkdir -p $(DOC_INST_DIR)
 	chmod 775 $(DOC_BASE_DIR)
-	cp $(PROJECT_NAME)/changelog $(DOC_INST_DIR)/
-	cp $(PROJECT_NAME)/description $(DOC_INST_DIR)/
+	cp $(ARTIFACT_NAME)/changelog $(DOC_INST_DIR)/
+	cp $(ARTIFACT_NAME)/description $(DOC_INST_DIR)/
 	cp README* $(DOC_INST_DIR)
 	find $(DOC_INST_DIR) -type d | xargs chmod 755
 	find $(DOC_INST_DIR) -type f | xargs chmod 644
