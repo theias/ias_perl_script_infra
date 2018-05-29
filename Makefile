@@ -169,6 +169,7 @@ self-replicate: install
 	mv build/$(ARTIFACT_NAME)-$(RELEASE_VERSION).tar.gz $(DOC_INST_DIR)/
 
 
+include $(MAKEFILE_PATH)/package_shell/make/package_install-base_directories.gmk
 include $(MAKEFILE_PATH)/package_shell/make/package_install-conditional_additions.gmk
 
 

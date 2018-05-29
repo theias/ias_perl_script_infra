@@ -5,36 +5,7 @@ install: \
 	package_install_final_cleanup
 
 
-package_install_base_directories:
 
-	# META-Docs by default are added.
-
-	mkdir -p $(ROOT_DIR)/$(BASE_DIR)
-	chmod -R 755 $(ROOT_DIR)
-	
-	mkdir -p $(DOC_INST_DIR)
-	chmod 775 $(DOC_BASE_DIR)
-	cp $(ARTIFACT_NAME)/changelog $(DOC_INST_DIR)/
-	cp $(ARTIFACT_NAME)/description $(DOC_INST_DIR)/
-	cp README* $(DOC_INST_DIR)
-	find $(DOC_INST_DIR) -type d | xargs chmod 755
-	find $(DOC_INST_DIR) -type f | xargs chmod 644
-
-	# Directories for FullProjectPath type apps:
-
-	
-
-	mkdir -p $(ROOT_DIR)/$(INPUT_DIR)
-	chmod 664 $(ROOT_DIR)/$(INPUT_DIR)
-	chmod 755 $(INPUT_BASE_DIR)
-	
-	mkdir -p $(ROOT_DIR)/$(OUTPUT_DIR)
-	chmod 664 $(ROOT_DIR)/$(OUTPUT_DIR)
-	chmod 755 $(OUTPUT_BASE_DIR)
-	
-	mkdir -p $(ROOT_DIR)/$(LOG_DIR)
-	chmod 664 $(ROOT_DIR)/$(LOG_DIR)
-	chmod 755 $(LOG_BASE_DIR)
 
 # Conditional additions
 
