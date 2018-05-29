@@ -1,0 +1,15 @@
+.PHONY: package_install-final_cleanup
+
+package_install-final_cleanup:
+	################
+	# Some Final Cleanup	
+	chmod -R a+r $(ROOT_DIR)
+	-find $(ROOT_DIR) -type d |xargs chmod a+rx
+	-find $(ROOT_DIR) -type d -name .svn | xargs -r rm -r
+	
+	################
+	# An example of creating a file owned by
+	# a non-root user (your system must have
+	# fakeroot installed and working):
+	# touch $(ROOT_DIR)/drop
+	# chown somegroup:somegroup $(ROOT_DIR)/drop

@@ -1,11 +1,4 @@
-install: \
-	builddir \
-	package_install_base_directories \
-	package_install_conditional_additions \
-	package_install_final_cleanup
-
-
-
+.PHONY: package_install_conditional_additions
 
 # Conditional additions
 
@@ -76,17 +69,3 @@ ifneq ("$(wildcard $(SRC_DIR)/root_etc/*)","")
 	find $(ROOT_DIR)/etc -type d | xargs -r chmod 755
 	find $(ROOT_DIR)/etc -type f | xargs -r chmod 644
 endif
-
-package_install_final_cleanup:
-	################
-	# Some Final Cleanup	
-	chmod -R a+r $(ROOT_DIR)
-	-find $(ROOT_DIR) -type d |xargs chmod a+rx
-	-find $(ROOT_DIR) -type d -name .svn | xargs -r rm -r
-	
-	################
-	# An example of creating a file owned by
-	# a non-root user (your system must have
-	# fakeroot installed and working):
-	# touch $(ROOT_DIR)/drop
-	# chown somegroup:somegroup $(ROOT_DIR)/drop

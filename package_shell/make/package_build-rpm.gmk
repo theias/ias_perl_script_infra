@@ -1,6 +1,14 @@
 SPEC_FILE_NAME = $(ARTIFACT_NAME)-$(RELEASE_VERSION)--pkginfo.spec
 SPEC_FILE = $(BUILD_DIR)/$(SPEC_FILE_NAME)
 
+.PHONY: \
+	package-rpm \
+	rpmspec \
+	cp-rpmspec \
+	rpmbuild
+
+package-rpm: clean all install rpmspec rpmbuild
+
 rpmspec: install
 	echo "" > $(SPEC_FILE)
 	echo "Name: $(ARTIFACT_NAME)" >> $(SPEC_FILE)

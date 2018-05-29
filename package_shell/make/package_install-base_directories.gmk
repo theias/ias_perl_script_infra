@@ -1,4 +1,6 @@
-package_install_base_directories:
+.PHONY: package_install-base_directories
+
+package_install-base_directories:
 
 	# META-Docs by default are added.
 

@@ -1,3 +1,5 @@
+.PHONY: all clean builddir install
+
 all:
 
 clean:
@@ -5,3 +7,10 @@ clean:
 
 builddir:
 	if [ ! -d $(BUILD_DIR) ]; then mkdir $(BUILD_DIR); fi;
+
+install: \
+	builddir \
+	package_install-base_directories \
+	package_install-conditional_additions \
+	package_install-final_cleanup
+

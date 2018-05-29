@@ -1,3 +1,5 @@
+.PHONY: debug
+
 debug:
 	# ARTIFACT_NAME: '$(ARTIFACT_NAME)'
 	# MAKEFILE_PATH: '$(MAKEFILE_PATH)'

@@ -1,3 +1,5 @@
+.PHONY: test test-all test-doc
+
 test-all: test test-doc
 
 test:

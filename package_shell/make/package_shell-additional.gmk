@@ -1,6 +1,4 @@
-package-rpm: clean all install rpmspec rpmbuild
-
-package-deb: clean all install debsetup debbuild
+.PHONY: release self-replicate
 
 release: test-all
 
