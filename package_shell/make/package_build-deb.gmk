@@ -1,0 +1,21 @@
+debsetup:
+	mkdir -p $(DEB_DIR)
+	echo "Package: " $(ARTIFACT_NAME) >> $(DEB_CONTROL_FILE)
+	echo "Version: " $(RELEASE_VERSION) >> $(DEB_CONTROL_FILE)
+	cat $(ARTIFACT_NAME)/deb_control >> $(DEB_CONTROL_FILE)
+	
+	echo "Description: " $(SUMMARY) >> $(DEB_CONTROL_FILE)
+	cat ./$(ARTIFACT_NAME)/description | egrep -v '^\s*$$' | sed 's/^/ /' >> $(DEB_CONTROL_FILE)
+
+# Project Config, example /opt/IAS/etc/(project-name)
+ifneq ("$(wildcard $(SRC_DIR)/etc/*)","")
+	-find $(ROOT_DIR)/$(CONF_DIR) -type f | sed -r "s|$(ROOT_DIR)||" >> $(DEB_CONF_FILES_FILE)
+endif
+
+ifneq ("$(wildcard $(SRC_DIR)/root_etc/*)","")
+	# /etc/ config files
+	-find $(ROOT_DIR)/etc -type f |  sed -r "s|$(ROOT_DIR)||" >> $(DEB_CONF_FILES_FILE)
+endif
+	
+debbuild:
+	dpkg-deb --build $(ROOT_DIR) $(BUILD_DIR)

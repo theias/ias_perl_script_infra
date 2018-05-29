@@ -111,46 +111,7 @@ package-deb: clean all install debsetup debbuild
 
 release: test-all
 
-test-all: test test-doc
 
-test:
-	
-	# Sytax checking routines.
-ifneq ("$(wildcard $(SRC_DIR)/bin/*.pl)","")
-	# Running Perl Tests
-	find $(SRC_DIR)/bin -type f \
-		-name '*.pl' \
-	| xargs -r perl -c 
-	
-endif
-
-ifneq ("$(wildcard $(SRC_DIR)/bin/*.sh)","")
-	# Running Bash Tests
-	find $(SRC_DIR)/bin -type f \
-		-name '*.sh' \
-	| xargs -r -n1 bash -n 
-	
-endif
-
-ifneq ("$(wildcard $(SRC_DIR)/bin/*.py)","") 
-	# Running Python Tests
-	find $(SRC_DIR)/bin -type f \
-		-name '*.py' \
-	| xargs -r -n1 python -m py_compile
-endif
-
-ifneq ("$(wildcard $(SRC_DIR)/bin/*.rb)","")
-	# Running Ruby Tests
-	find $(SRC_DIR)/bin -type f \
-		-name '*.rb' \
-	| xargs -r -n1 ruby -c
-endif
-
-test-doc:
-	find $(SRC_DIR) -type f \
-		-name '*.pl' \
-		-o -name '*.pm' \
-	| xargs -r podchecker
 
 builddir:
 	if [ ! -d build ]; then mkdir build; fi;
@@ -168,105 +129,12 @@ self-replicate: install
 	
 	mv build/$(ARTIFACT_NAME)-$(RELEASE_VERSION).tar.gz $(DOC_INST_DIR)/
 
-
+include $(MAKEFILE_PATH)/package_shell/make/source-basic_tests.gmk
 include $(MAKEFILE_PATH)/package_shell/make/package_install-base_directories.gmk
 include $(MAKEFILE_PATH)/package_shell/make/package_install-conditional_additions.gmk
+include $(MAKEFILE_PATH)/package_shell/make/package_build-rpm.gmk
+include $(MAKEFILE_PATH)/package_shell/make/package_build-deb.gmk
 
 
 	
 
-rpmspec: install
-	echo "" > $(SPEC_FILE)
-	echo "Name: $(ARTIFACT_NAME)" >> $(SPEC_FILE)
-	echo "Version: $(SRC_VERSION)" >> $(SPEC_FILE)
-	echo "Release: $(PKG_VERSION)" >> $(SPEC_FILE)
-	echo "BuildArch: $(ARCH)" >> $(SPEC_FILE)
-	echo `svn info |grep '^URL:'` >> $(SPEC_FILE)
-	echo "Packager: $$USER" >> $(SPEC_FILE)
-	
-	# cat ./$(ARTIFACT_NAME)/pkginfo >> $(SPEC_FILE)
-	cat ./$(ARTIFACT_NAME)/rpm_specific >> $(SPEC_FILE)
-	for file in $(ARTIFACT_NAME)/install_scripts/*; do echo "%"`basename $$file` >> $(SPEC_FILE); cat $$file >> $(SPEC_FILE); done
-	echo "%description" >> $(SPEC_FILE)
-	cat ./$(ARTIFACT_NAME)/description >> $(SPEC_FILE)
-	echo "" >> $(SPEC_FILE)
-
-	echo "%files" >> $(SPEC_FILE)
-
-	# These are created by default
-	echo "%defattr(644, root, root, 755)" >> $(SPEC_FILE)
-	echo "$(DOC_DIR)" >> $(SPEC_FILE)
-	
-	echo "%defattr(664, root, root, 755) " >> $(SPEC_FILE)
-	echo "$(INPUT_DIR)" >> $(SPEC_FILE)
-	
-	echo "%defattr(664, root, root, 755) " >> $(SPEC_FILE)
-	echo "$(OUTPUT_DIR)" >> $(SPEC_FILE)
-	
-	echo "%defattr(664, root, root, 755) " >> $(SPEC_FILE)
-	echo "$(LOG_DIR)" >> $(SPEC_FILE)
-
-# Binaries
-ifneq ("$(wildcard $(SRC_DIR)/bin/*)","")
-	echo "%defattr(755, root, root, 755) " >> $(SPEC_FILE)
-	echo "$(BIN_DIR)" >> $(SPEC_FILE)
-endif
-
-# cgi-bin
-ifneq ("$(wildcard $(SRC_DIR)/cgi-bin/*)","")
-	echo "%defattr(755, root, root, 755) " >> $(SPEC_FILE)
-	echo "$(CGI_BIN_DIR)" >> $(SPEC_FILE)
-endif
-
-# Templates
-ifneq ("$(wildcard $(SRC_DIR)/templates/*)","")	
-	echo "%defattr(664, root, root, 755) " >> $(SPEC_FILE)
-	echo "$(TEMPLATE_DIR)" >> $(SPEC_FILE)
-endif
-
-# Libraries
-ifneq ("$(wildcard $(SRC_DIR)/lib/*)","")
-	echo "%defattr(644, root, root,755) " >> $(SPEC_FILE)
-	echo "$(LIB_DIR)" >> $(SPEC_FILE)
-endif
-
-# Project Config, example /opt/IAS/etc/(project-name)
-ifneq ("$(wildcard $(SRC_DIR)/etc/*)","")
-	echo "%defattr(644, root, root,755) " >> $(SPEC_FILE)
-	echo "%dir $(CONF_DIR)" >> $(SPEC_FILE)
-	-find $(ROOT_DIR)/$(CONF_DIR) -type f | sed -r "s|$(ROOT_DIR)|%config |"  >> $(SPEC_FILE)
-endif
-
-ifneq ("$(wildcard $(SRC_DIR)/root_etc/*)","")
-	# /etc/ config files
-	-find $(ROOT_DIR)/etc -type f |  sed -r "s|$(ROOT_DIR)|%config(noreplace) |" >> $(SPEC_FILE)
-endif
-
-
-cp-rpmspec: builddir
-	cp $(ARTIFACT_NAME)/$(SPEC_FILE_NAME) $(SPEC_FILE)
-
-rpmbuild:
-	rpmbuild --buildroot $(ROOT_DIR) -bb $(SPEC_FILE) --define '_topdir $(BUILD_DIR)' --define '_rpmtopdir $(BUILD_DIR)'
-	
-debsetup:
-	mkdir -p $(DEB_DIR)
-	echo "Package: " $(ARTIFACT_NAME) >> $(DEB_CONTROL_FILE)
-	echo "Version: " $(RELEASE_VERSION) >> $(DEB_CONTROL_FILE)
-	cat $(ARTIFACT_NAME)/deb_control >> $(DEB_CONTROL_FILE)
-	
-	echo "Description: " $(SUMMARY) >> $(DEB_CONTROL_FILE)
-	cat ./$(ARTIFACT_NAME)/description | egrep -v '^\s*$$' | sed 's/^/ /' >> $(DEB_CONTROL_FILE)
-
-# Project Config, example /opt/IAS/etc/(project-name)
-ifneq ("$(wildcard $(SRC_DIR)/etc/*)","")
-	-find $(ROOT_DIR)/$(CONF_DIR) -type f | sed -r "s|$(ROOT_DIR)||" >> $(DEB_CONF_FILES_FILE)
-endif
-
-ifneq ("$(wildcard $(SRC_DIR)/root_etc/*)","")
-	# /etc/ config files
-	-find $(ROOT_DIR)/etc -type f |  sed -r "s|$(ROOT_DIR)||" >> $(DEB_CONF_FILES_FILE)
-endif
-	
-debbuild:
-	dpkg-deb --build $(ROOT_DIR) $(BUILD_DIR)
