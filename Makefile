@@ -16,6 +16,7 @@ RELEASE_VERSION := $(shell cat '$(CHANGELOG_FILE)' | grep -v '^\s+$$' | head -n 
 ARCH := $(shell cat $(CHANGELOG_FILE) | grep -v '^\s+$$' | head -n 1 | awk '{print $$3}'|sed 's/;//')
 SRC_VERSION := $(shell echo '$(RELEASE_VERSION)' | awk -F '-' '{print $$1}')
 PKG_VERSION := $(shell echo '$(RELEASE_VERSION)' | awk -F '-' '{print $$2}')
+SUMMARY := $(shell egrep '^Summary:' ./$(ARTIFACT_NAME)/rpm_specific | awk -F ':' '{print $$2}')
 
 SRC_DIR = $(PROJECT_DIR)/src
 
@@ -60,14 +61,14 @@ DEB_DIR=$(ROOT_DIR)/DEBIAN
 DEB_CONTROL_FILE=$(DEB_DIR)/control
 DEB_CONF_FILES_FILE=$(DEB_DIR)/conffiles
 
-SUMMARY := $(shell egrep '^Summary:' ./$(ARTIFACT_NAME)/rpm_specific | awk -F ':' '{print $$2}')
+
 
 include $(MAKEFILE_PATH)/package_shell/make/make-debug.gmk
 
 all:
 
 clean:
-	-rm -rf $(PROJECT_DIR)/build
+	-rm -rf $(BUILD_DIR)
 
 
 
@@ -80,7 +81,7 @@ release: test-all
 
 
 builddir:
-	if [ ! -d build ]; then mkdir build; fi;
+	if [ ! -d $(BUILD_DIR) ]; then mkdir $(BUILD_DIR); fi;
 
 self-replicate: install
 	# Self Replicating
@@ -90,10 +91,10 @@ self-replicate: install
 	ls | egrep -v '(build|\.svn)' | \
 		xargs -n1 -i cp -r {} ./build/$(ARTIFACT_NAME)-$(RELEASE_VERSION)/
 	
-	cd build && tar czvf $(ARTIFACT_NAME)-$(RELEASE_VERSION).tar.gz \
+	cd $(BUILD_DIR) && tar czvf $(ARTIFACT_NAME)-$(RELEASE_VERSION).tar.gz \
 		$(ARTIFACT_NAME)-$(RELEASE_VERSION)
 	
-	mv build/$(ARTIFACT_NAME)-$(RELEASE_VERSION).tar.gz $(DOC_INST_DIR)/
+	mv $(BUILD_DIR)/$(ARTIFACT_NAME)-$(RELEASE_VERSION).tar.gz $(DOC_INST_DIR)/
 
 include $(MAKEFILE_PATH)/package_shell/make/source-basic_tests.gmk
 include $(MAKEFILE_PATH)/package_shell/make/package_install-base_directories.gmk
