@@ -36,17 +36,24 @@ CGI_BIN_INST_DIR=$(ROOT_DIR)/$(CGI_BIN_DIR)
 LIB_DIR=$(BASE_DIR)/lib
 LIB_INST_DIR=$(ROOT_DIR)/$(LIB_DIR)
 
-DOC_DIR=$(BASE_DIR)/doc/$(PROJECT_NAME)
+DOC_BASE_DIR=$(BASE_DIR)/doc
+DOC_DIR=$(DOC_BASE_DIR)/$(PROJECT_NAME)
 DOC_INST_DIR=$(ROOT_DIR)$(DOC_DIR)
 
 TEMPLATE_DIR=$(BASE_DIR)/templates/$(PROJECT_NAME)
 TEMPLATE_INST_DIR=$(ROOT_DIR)/$(TEMPLATE_DIR)
 
 # Directories for FullProjectPath type apps:
-INPUT_DIR=$(BASE_DIR)/input/$(PROJECT_NAME)
-OUTPUT_DIR=$(BASE_DIR)/output/$(PROJECT_NAME)
-CONF_DIR=$(BASE_DIR)/etc/$(PROJECT_NAME)
-LOG_DIR=$(BASE_DIR)/log/$(PROJECT_NAME)
+INPUT_BASE_DIR=$(BASE_DIR)/input
+OUTPUT_BASE_DIR=$(BASE_DIR)/output
+CONF_BASE_DIR=$(BASE_DIR)/etc
+LOG_BASE_DIR=$(BASE_DIR)/log
+
+
+INPUT_DIR=$(INPUT_BASE_DIR)/$(PROJECT_NAME)
+OUTPUT_DIR=$(OUTPUT_BASE_DIR)/$(PROJECT_NAME)
+CONF_DIR=$(CONF_BASE_DIR)/$(PROJECT_NAME)
+LOG_DIR=$(LOG_BASE_DIR)/$(PROJECT_NAME)
 
 
 DEB_DIR=$(ROOT_DIR)/DEBIAN
@@ -166,31 +173,48 @@ install: builddir
 
 	# META-Docs by default are added.
 	
+	mkdir -p $(ROOT_DIR)/$(BASE_DIR)
+	chmod -R 755 $(ROOT_DIR)
+	
 	mkdir -p $(DOC_INST_DIR)
+	chmod 775 $(DOC_BASE_DIR)
 	cp $(PROJECT_NAME)/changelog $(DOC_INST_DIR)/
 	cp $(PROJECT_NAME)/description $(DOC_INST_DIR)/
 	cp README* $(DOC_INST_DIR)
+	find $(DOC_INST_DIR) -type d | xargs chmod 755
 	find $(DOC_INST_DIR) -type f | xargs chmod 644
 
 	# Directories for FullProjectPath type apps:
 
-	mkdir -p $(ROOT_DIR)/$(INPUT_DIR)
-	mkdir -p $(ROOT_DIR)/$(OUTPUT_DIR)
-	mkdir -p $(ROOT_DIR)/$(LOG_DIR)
+	
 
+	mkdir -p $(ROOT_DIR)/$(INPUT_DIR)
+	chmod 664 $(ROOT_DIR)/$(INPUT_DIR)
+	chmod 755 $(INPUT_BASE_DIR)
+	
+	mkdir -p $(ROOT_DIR)/$(OUTPUT_DIR)
+	chmod 664 $(ROOT_DIR)/$(OUTPUT_DIR)
+	chmod 755 $(OUTPUT_BASE_DIR)
+	
+	mkdir -p $(ROOT_DIR)/$(LOG_DIR)
+	chmod 664 $(ROOT_DIR)/$(LOG_DIR)
+	chmod 755 $(LOG_BASE_DIR)
 
 # Conditional additions
 
 ifneq ("$(wildcard $(SRC_DIR)/run_scripts/*)","")
 	# Installing run scripts
 	cp -r $(SRC_DIR)/run_scripts $(DOC_INST_DIR)/run_scripts
-
+	find $(DOC_INST_DIR)/run_scripts -type d | xargs -r chmod 755
+	find $(DOC_INST_DIR)/run_scripts -type f | xargs -r chmod 755
+	
 endif
 
 ifneq ("$(wildcard $(PROJECT_DIR)/doc/*)","") 
 	# Installing more documentation
 	mkdir -p $(DOC_INST_DIR)
 	cp -r $(PROJECT_DIR)/doc $(DOC_INST_DIR)/doc
+	find $(DOC_INST_DIR) -type d | xargs -r chmod 755
 	find $(DOC_INST_DIR) -type f | xargs -r chmod 644
 endif
 
@@ -198,13 +222,16 @@ ifneq ("$(wildcard $(SRC_DIR)/bin/*)","")
 	# Installing binaries.
 	mkdir -p $(ROOT_DIR)/$(BIN_DIR)
 	cp -r $(SRC_DIR)/bin/* $(ROOT_DIR)/$(BIN_DIR)
+	find $(BIN_INST_DIR) -type d | xargs -r chmod 755
 	find $(BIN_INST_DIR) -type f | xargs -r chmod 755
+
 endif
 
 ifneq ("$(wildcard $(SRC_DIR)/cgi-bin/*)","") 
 	# Installing CGI-BIN files
 	mkdir -p $(ROOT_DIR)/$(CGI_BIN_DIR)
 	-cp -r $(SRC_DIR)/cgi-bin/* $(ROOT_DIR)/$(CGI_BIN_DIR)
+	-find $(CGI_BIN_INST_DIR) -type d | xargs -r chmod 755
 	-find $(CGI_BIN_INST_DIR) -type f | xargs -r chmod 755
 endif
 	
@@ -212,6 +239,7 @@ ifneq ("$(wildcard $(SRC_DIR)/templates/*)","")
 	# Installing Templates
 	mkdir -p $(TEMPLATE_INST_DIR)
 	cp -r $(SRC_DIR)/templates $(TEMPLATE_INST_DIR)
+	find $(TEMPLATE_INST_DIR) -type d | xargs -r chmod 755
 	find $(TEMPLATE_INST_DIR) -type f | xargs -r chmod 644
 endif
 
@@ -220,20 +248,24 @@ ifneq ("$(wildcard $(SRC_DIR)/lib/*)","")
 	# Installing libraries
 	mkdir -p $(LIB_INST_DIR)
 	cp -r $(SRC_DIR)/lib/* $(LIB_INST_DIR)
-	find $(SRC_DIR)/lib/ | xargs -r chmod 644
+	find $(LIB_INST_DIR) -type d | xargs -r chmod 755
+	find $(LIB_INST_DIR) -type f | xargs -r chmod 644
+	
 endif
 
 ifneq ("$(wildcard $(SRC_DIR)/etc/*)","")
 	# Installing project directory configuration
 	mkdir -p $(ROOT_DIR)/$(CONF_DIR)
 	cp -r $(SRC_DIR)/etc/* $(ROOT_DIR)/$(CONF_DIR)/
-	chmod 0644 $(ROOT_DIR)/$(CONF_DIR)
+	find $(ROOT_DIR)/$(CONF_DIR)/ -type d | xargs -r chmod 755
+	find $(ROOT_DIR)/$(CONF_DIR)/ -type f | xargs -r chmod 644
 endif
 
 ifneq ("$(wildcard $(SRC_DIR)/root_etc/*)","")
 	# Installing things to /etc
 	cp -r $(SRC_DIR)/root_etc $(ROOT_DIR)/etc
-	chmod -R 0644 $(ROOT_DIR)/etc
+	find $(ROOT_DIR)/etc -type d | xargs -r chmod 755
+	find $(ROOT_DIR)/etc -type f | xargs -r chmod 644
 endif
 
 	################
