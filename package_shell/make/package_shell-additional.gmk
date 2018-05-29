@@ -1,0 +1,18 @@
+package-rpm: clean all install rpmspec rpmbuild
+
+package-deb: clean all install debsetup debbuild
+
+release: test-all
+
+self-replicate: install
+	# Self Replicating
+	# This will put a copy of the source tree in a tar.gz file
+	# in the doc dir.
+	
+	ls | egrep -v '(build|\.svn)' | \
+		xargs -n1 -i cp -r {} ./build/$(ARTIFACT_NAME)-$(RELEASE_VERSION)/
+	
+	cd $(BUILD_DIR) && tar czvf $(ARTIFACT_NAME)-$(RELEASE_VERSION).tar.gz \
+		$(ARTIFACT_NAME)-$(RELEASE_VERSION)
+	
+	mv $(BUILD_DIR)/$(ARTIFACT_NAME)-$(RELEASE_VERSION).tar.gz $(DOC_INST_DIR)/

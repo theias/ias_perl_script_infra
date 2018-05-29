@@ -1,0 +1,19 @@
+SHELL_PWD = $(shell echo `pwd`)
+
+
+PROJECT_DIR = $(MAKEFILE_PATH)
+SCRATCH_AREA = $(SHELL_PWD)
+
+CHANGELOG_FILE = $(PROJECT_DIR)/$(ARTIFACT_NAME)/changelog
+RELEASE_VERSION := $(shell cat '$(CHANGELOG_FILE)' | grep -v '^\s+$$' | head -n 1 | awk '{print $$2}')
+ARCH := $(shell cat $(CHANGELOG_FILE) | grep -v '^\s+$$' | head -n 1 | awk '{print $$3}'|sed 's/;//')
+SRC_VERSION := $(shell echo '$(RELEASE_VERSION)' | awk -F '-' '{print $$1}')
+PKG_VERSION := $(shell echo '$(RELEASE_VERSION)' | awk -F '-' '{print $$2}')
+SUMMARY := $(shell egrep '^Summary:' ./$(ARTIFACT_NAME)/rpm_specific | awk -F ':' '{print $$2}')
+
+SRC_DIR = $(PROJECT_DIR)/src
+DROP_DIR = $(SCRATCH_AREA)/drop
+BUILD_DIR = $(SCRATCH_AREA)/build
+ROOT_DIR = $(BUILD_DIR)/root
+
+BASE_DIR = /opt/IAS
