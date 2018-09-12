@@ -1,3 +1,10 @@
+ias-perl-script-infra 1.7.0-0 noarch; urgency=low
+
+	* Improvements
+
+ -- Martin VanWinkle mvanwinkle@ias.edu  Wed, 12 Sep 2018 09:43:31 -0400
+
+
 ias-perl-script-infra 1.6.1-0 noarch; urgency=low
 
 	* Fixes to comments in code about "dev" vs "prod"
