@@ -8,7 +8,7 @@ IAS::Infra::SimplePrompts
 
 =head1 SYNOPSIS
 
-  my $user_name = $self->simple_stdin_prompt("Username: ");  
+  my $username = $self->simple_stdin_prompt("Username: ");  
   my $password = $self->simple_stdin_password_prompt("Password:");
 
 =head1 DESCRIPTION
