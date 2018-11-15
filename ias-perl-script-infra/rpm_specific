@@ -4,3 +4,4 @@ Summary: An infrastructure framework
 Group: Generic Group
 License: Generic License
 Vendor: Generic Vendor
+BuildArch: noarch
