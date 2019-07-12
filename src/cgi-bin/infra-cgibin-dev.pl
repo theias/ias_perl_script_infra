@@ -29,14 +29,18 @@ exit;
 
 package IAS::CGIBin::Application1;
 
-use IAS::Infra::CGIBinPaths;
 use CGI;
-use CGI::Carp qw(fatalsToBrowser);
+# use CGI::Carp qw(fatalsToBrowser);
+
+use Data::Dumper;
+
+use IAS::Infra::CGIBinPaths;
 
 sub new
 {
 	my ($type, $self) = shift;
 
+	$self->{CBP} = IAS::Infra::CGIBinPaths->new();
 	return bless $self, $type;
 }
 
@@ -49,6 +53,7 @@ sub run
 	print $cgi->header();
 	
 	print "Hello.\n";
+	print Dumper($self->{CBP}),$/;
 }
 
 exit;

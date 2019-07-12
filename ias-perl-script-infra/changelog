@@ -1,3 +1,8 @@
+ias-perl-script-infra 1.8.0-0 noarch; urgency=low
+
+	* Rebased the package
+
+
 ias-perl-script-infra 1.7.0-0 noarch; urgency=low
 
 	* Improvements
