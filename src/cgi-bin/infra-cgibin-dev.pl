@@ -15,8 +15,9 @@ BEGIN {
 	
 	$RealPath = Cwd::realpath(__FILE__);
 }
-use lib dirname($RealPath).'/../lib/perl5';
+
 use lib '/opt/IAS/lib/perl5';
+use lib dirname($RealPath).'/../lib/perl5';
 
 my $app = new IAS::CGIBin::Application1;
 
@@ -52,8 +53,9 @@ sub run
 	
 	print $cgi->header();
 	
-	print "Hello.\n";
+	print "<pre>Hello.\n";
 	print Dumper($self->{CBP}),$/;
+	print "</pre>\n";
 }
 
 exit;

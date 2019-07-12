@@ -40,7 +40,7 @@ sub is_in_src_dir
 		$whence =~ s/\/\//\//g;
 		
 		my @path_parts = split('/',$whence);
-		print Dumper(\@path_parts);
+		# print Dumper(\@path_parts);
 		if ($path_parts[-2] eq 'src')
 		{
 			return $self->{in_src_dir} = 1;
