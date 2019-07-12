@@ -1,0 +1,86 @@
+# Currently experimental
+# Use it like this in your artifact_variables.gmk:
+#
+# JAVA_APP_NAME=IAS/SampleApplication
+# JAVA_PATHS_PROGRAM=$(SRC_DIR)/bin/java_paths.sh
+#
+# include $(PACKAGE_SHELL_INCLUDE_PATH)/artifact_module-java.gmk
+# artifact_debug: artifact_module-java-debug
+#
+# artifact_clean: \
+#	java-clean
+#
+# artifact_all: java-compile-all
+#
+# artifact_install: \
+#	package_install-standard \
+#	java-install
+	
+
+JAVA_SRC_JAVA_DIR=$(SRC_DIR)/java
+JAVA_SRC_LIB_DIR=$(SRC_DIR)/lib/java
+JAVA_BASE_LIB_DIR=$(BASE_DIR)/lib/java
+
+ifeq ($(JAVA_PATHS_PROGRAM),)
+	JAVA_CLASSPATH="$(JAVA_SRC_LIB_DIR):$(JAVA_ARTIFACT_CLASSPATH):$(JAVA_BASE_LIB_DIR)"
+	JAVA_SOURCEPATH="$(JAVA_SRC_JAVA_DIR)"
+else
+	JAVA_CLASSPATH=$(shell $(JAVA_PATHS_PROGRAM) classpath )
+	JAVA_SOURCEPATH=$(shell $(JAVA_PATHS_PROGRAM) sourcepath )
+endif
+
+JAVA_SRC_JAVA_FILES=$(wildcard $(JAVA_SRC_JAVA_DIR)/**/*.java)
+JAVA_SRC_JAVA_CLASS_FILES=$(patsubst %.java, %.class, $(JAVA_SRC_JAVA_FILES))
+
+artifact_module-java-debug:
+	# artifact_module-java-debug - debug variables
+	#   JAVA_SRC_JAVA_DIR: "$(JAVA_SRC_JAVA_DIR)"
+	#   JAVA_SRC_LIB_DIR: "$(JAVA_SRC_LIB_DIR)"
+	#   JAVA_BASE_LIB_DIR: "$(JAVA_BASE_LIB_DIR)"
+	#   JAVA_ARTIFACT_CLASSPATH: "$(JAVA_ARTIFACT_CLASSPATH)"
+	#   JAVA_PATHS_PROGRAM: "$(JAVA_PATHS_PROGRAM)"
+	#   JAVA_CLASSPATH: "$(JAVA_CLASSPATH)"
+	#   JAVA_SOURCEPATH: "$(JAVA_SOURCEPATH)"
+	
+	#   JAVA_SRC_JAVA_FILES: $(JAVA_SRC_JAVA_FILES)
+	#   JAVA_SRC_JAVA_CLASS_FILES: $(JAVA_SRC_JAVA_CLASS_FILES)
+	
+
+java-compile: java-compile-all	
+
+java-fresh-run: java-clean java-compile java-run
+
+java-clean:
+	find "$(JAVA_SRC_JAVA_DIR)" -type f -name '*.class' -exec rm {} \;
+
+java-compile-single:
+	javac \
+		-sourcepath "$(JAVA_SOURCEPATH)" \
+		-classpath "$(JAVA_CLASSPATH)" \
+		$(JAVA_SRC_JAVA_FILES)
+
+java-compile-all: $(JAVA_SRC_JAVA_CLASS_FILES)
+
+%.class : \
+	%.java
+	
+	javac  \
+		-sourcepath "$(JAVA_SOURCEPATH)" \
+		-classpath "$(JAVA_CLASSPATH)" \
+		"$<"
+	
+
+java-run:
+	java \
+	-classpath "$(JAVA_SOURCEPATH):$(JAVA_CLASSPATH)" \
+	$(JAVA_APP_NAME)
+
+java-install: java-compile
+	cp -r "$(JAVA_SRC_JAVA_DIR)" "$(LIB_INST_DIR)"
+
+
+## Scratch area
+#JAVA_SRC_JAVA_CLASS_FILES=$(patsubst %.java, %.class, $(JAVA_SRC_JAVA_FILES))
+#############################
+# end scratch area
+#############################

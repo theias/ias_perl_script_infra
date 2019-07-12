@@ -1,16 +1,50 @@
 .PHONY: all clean builddir install
 
-all:
+all: artifact_all
 
-clean:
-	-rm -rf $(BUILD_DIR)
+clean: project_clean-standard artifact_clean
+
+.PHONY: artifact_all
+artifact_all:
+
+.PHONY: artifact_test
+
+artifact_test:
+
+.PHONY: artifact_debug
+artifact_debug:
+
+.PHONY: artifact_clean
+artifact_clean:
+
+.PHONY: artifact_install
+artifact_install: package_install-standard
+
+.PHONY: artifact_install-post
+artifact_install-post:
+
+package_install-standard: \
+	package_install-conditional_additions-ALL \
+	package_install-code_repository_info_md_file
+
+.PHONY: project_clean-standard
+
+project_clean-standard:
+	-rm -rf "$(BUILD_BASE_DIR)"
 
 builddir:
-	if [ ! -d $(BUILD_DIR) ]; then mkdir $(BUILD_DIR); fi;
+	if [ ! -d "$(BUILD_DIR)" ]; then mkdir -p "$(BUILD_DIR)"; fi;
 
 install: \
 	builddir \
 	package_install-base_directories \
-	package_install-conditional_additions \
-	package_install-final_cleanup
+	artifact_install \
+	package_install-mapped_symbolic_links \
+	package_install-final_cleanup \
+	artifact_install-post
 
+.PHONY: debug-make-standard_phonies
+
+debug-make-standard_phonies: artifact_debug
+	# make-standard_phonies - debug variables
+	#   (no variables defined)

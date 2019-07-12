@@ -1,0 +1,18 @@
+BASE_DIR = /opt/IAS
+PROJECT_DIRECTORIES_MAKE_FILE=project_directories-full_project.gmk
+
+# For testing basic package building, we don't
+# want these set.  These are here because we
+# allow them to be set by the templating system
+# 
+# USE_AUTOMATION_PERMISSIONS = 1
+# AUTOMATION_USER = "iasnetauto"
+# AUTOMATION_GROUP = "iasnetauto"
+
+
+.PHONY: debug-project-test_defaults
+
+debug-project-test_defaults:
+	# project-test_defaults - debug variables
+	#   BASE_DIR: '$(BASE_DIR)'
+	#   PROJECT_DIRECTORIES_MAKE_FILE: '$(PROJECT_DIRECTORIES_MAKE_FILE)'

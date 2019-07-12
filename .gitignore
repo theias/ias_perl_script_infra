@@ -1,7 +1,15 @@
 build
-
 drop/*
 
 src/input/*
 src/output/*
+src/log/*
+
+*.swp
+__pycache__/
+*.pyc
+
+*.dia.autosave
+
+src/java/**/*.class
 

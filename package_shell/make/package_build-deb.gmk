@@ -10,23 +10,33 @@ DEB_CONF_FILES_FILE=$(DEB_DIR)/conffiles
 package-deb: clean all install debsetup debbuild
 
 debsetup:
-	mkdir -p $(DEB_DIR)
-	echo "Package: " $(ARTIFACT_NAME) >> $(DEB_CONTROL_FILE)
-	echo "Version: " $(RELEASE_VERSION) >> $(DEB_CONTROL_FILE)
-	cat $(ARTIFACT_NAME)/deb_control >> $(DEB_CONTROL_FILE)
-	
-	echo "Description: " $(SUMMARY) >> $(DEB_CONTROL_FILE)
-	cat ./$(ARTIFACT_NAME)/description | egrep -v '^\s*$$' | sed 's/^/ /' >> $(DEB_CONTROL_FILE)
+	# mkdir -p "$(DEB_DIR)"
+	cp -rL "$(ARTIFACT_DIR)/DEBIAN" "$(DEB_DIR)"
+	"$(ARTIFACT_DIR)/case.sh" all DEB > "$(DEB_CONTROL_FILE)"
+	cat "$(ARTIFACT_DIR)/DEBIAN/control" >> "$(DEB_CONTROL_FILE)"
 
-# Project Config, example /opt/IAS/etc/(project-name)
-ifneq ("$(wildcard $(SRC_DIR)/etc/*)","")
-	-find $(ROOT_DIR)/$(CONF_DIR) -type f | sed -r "s|$(ROOT_DIR)||" >> $(DEB_CONF_FILES_FILE)
-endif
+	# Project config files
+	if [ -e "$(CONF_INST_DIR)" ]; then \
+		find "$(CONF_INST_DIR)" \( -type l -o -type f \) \
+			|  sed -r "s|$(ROOT_DIR)||" \
+			>> "$(DEB_CONF_FILES_FILE)" ; \
+	fi
 
-ifneq ("$(wildcard $(SRC_DIR)/root_etc/*)","")
 	# /etc/ config files
-	-find $(ROOT_DIR)/etc -type f |  sed -r "s|$(ROOT_DIR)||" >> $(DEB_CONF_FILES_FILE)
-endif
+	if [ -e "$(ROOT_DIR)/etc" ]; then \
+		find "$(ROOT_DIR)/etc" \( -type l -o -type f \) \
+			|  sed -r "s|$(ROOT_DIR)||" \
+			>> "$(DEB_CONF_FILES_FILE)" ; \
+	fi
+	
 	
 debbuild:
-	dpkg-deb --build $(ROOT_DIR) $(BUILD_DIR)
+	dpkg-deb --build "$(ROOT_DIR)" "$(BUILD_DIR)"
+	
+.PHONY: debug-package_build-deb
+
+debug-package_build-deb:
+	# package_build-deb - debug variables
+	#   DEB_DIR: '$(DEB_DIR)'
+	#   DEB_CONTROL_FILE: '$(DEB_CONTROL_FILE)'
+	#   DEB_CONF_FILES_FILE: '$(DEB_CONF_FILES_FILE)'

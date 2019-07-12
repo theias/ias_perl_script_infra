@@ -1,0 +1,28 @@
+.PHONY: package_install-mapped_symbolic_links 
+
+package_install-mapped_symbolic_links: \
+	package_install-mapped_symbolic_links-usr_bin
+
+.PHONY: package_install-mapped_symbolic_links-usr_bin
+
+package_install-mapped_symbolic_links-usr_bin:
+	# package_install-mapped_symbolic_links-usr_bin
+	for link_me in $(symbolic_links-usr_bin); do \
+		case $$link_me in \
+			*[![:space:]]*) \
+				mkdir -p "$(ROOT_DIR)/usr/bin" ; \
+				echo ln $(BIN_INST_DIR)/$$link_me $(ROOT_DIR)/usr/bin/$$link_me; \
+				ln -s "$(BIN_DIR)/$$link_me" "$(ROOT_DIR)/usr/bin/$$link_me"; \
+			;; \
+			*) \
+				echo "ERROR: Can't symbolically link something that's all whitespace."; \
+				echo "Check symbolic_links-usr_bin in artifact_variables.gmk"; \
+			;; \
+		esac ; \
+	done
+
+.PHONY: debug-package_install-mapped_symbolic_links
+
+debug-package_install-mapped_symbolic_links:
+	# package_install-mapped_symbolic_links - debug variables
+	#   symbolc_links-usr_bin: $(symbolic_links-usr_bin)

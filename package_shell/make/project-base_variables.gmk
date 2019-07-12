@@ -1,19 +1,49 @@
 SHELL_PWD = $(shell echo `pwd`)
 
-
 PROJECT_DIR = $(MAKEFILE_PATH)
+
+# (Ideally) this would allow you to cd to any directory
+# and run make from there.
 SCRATCH_AREA = $(SHELL_PWD)
 
-CHANGELOG_FILE = $(PROJECT_DIR)/$(ARTIFACT_NAME)/changelog
-RELEASE_VERSION := $(shell cat '$(CHANGELOG_FILE)' | grep -v '^\s+$$' | head -n 1 | awk '{print $$2}')
-ARCH := $(shell cat $(CHANGELOG_FILE) | grep -v '^\s+$$' | head -n 1 | awk '{print $$3}'|sed 's/;//')
+ARTIFACT_DIR=$(PROJECT_DIR)/$(ARTIFACT_NAME)
+
+CHANGELOG_FILE = $(ARTIFACT_DIR)/changelog
+RELEASE_VERSION := $(shell cat "$(CHANGELOG_FILE)" | grep -v '^\s+$$' | head -n 1 | awk '{print $$2}')
+ARCH := $(shell cat "$(CHANGELOG_FILE)" | grep -v '^\s+$$' | head -n 1 | awk '{print $$3}'|sed 's/;//')
 SRC_VERSION := $(shell echo '$(RELEASE_VERSION)' | awk -F '-' '{print $$1}')
 PKG_VERSION := $(shell echo '$(RELEASE_VERSION)' | awk -F '-' '{print $$2}')
-SUMMARY := $(shell egrep '^Summary:' ./$(ARTIFACT_NAME)/rpm_specific | awk -F ':' '{print $$2}')
 
 SRC_DIR = $(PROJECT_DIR)/src
 DROP_DIR = $(SCRATCH_AREA)/drop
-BUILD_DIR = $(SCRATCH_AREA)/build
+BUILD_BASE_DIR=$(SCRATCH_AREA)/build
+BUILD_DIR = $(BUILD_BASE_DIR)/$(ARTIFACT_NAME)
 ROOT_DIR = $(BUILD_DIR)/root
 
-BASE_DIR = /opt/IAS
+.PHONY: debug-project-base_variables
+
+debug-project-base_variables:
+	# project-base_variables - debug variables
+	#   SHELL_PWD: '$(SHELL_PWD)'
+	#
+	#   PROJECT_DIR: '$(PROJECT_DIR)'
+	#   ARTIFACT_DIR: '$(ARTIFACT_DIR)'
+	#   SCRATCH_AREA: '$(SCRATCH_AREA)'
+	#
+	#   CHANGELOG_FILE: '$(CHANGELOG_FILE)'
+	#   RELEASE_VERSION: '$(RELEASE_VERSION)'
+	#   ARCH: '$(ARCH)'
+	#   SRC_VERSION: '$(SRC_VERSION)'
+	#   PKG_VERSION: '$(PKG_VERSION)'
+	#   SUMMARY: '$(SUMMARY)'
+	#
+	#   SRC_DIR: '$(SRC_DIR)'
+	#   DROP_DIR: '$(DROP_DIR)'
+	#   BUILD_BASE_DIR: '$(BUILD_BASE_DIR)'
+	#   BUILD_DIR: '$(BUILD_DIR)'
+	#   ROOT_DIR: '$(ROOT_DIR)'
+	#   BASE_DIR: '$(BASE_DIR)'
+	#
+	#   USE_AUTOMATION_PERMISSIONS: '$(USE_AUTOMATION_PERMISSIONS)'
+	#   AUTOMATION_USER: '$(AUTOMATION_USER)'
+	#   AUTOMATION_GROUP: '$(AUTOMATION_GROUP)'

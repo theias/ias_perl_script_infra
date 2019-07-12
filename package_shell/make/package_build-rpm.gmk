@@ -9,75 +9,93 @@ SPEC_FILE = $(BUILD_DIR)/$(SPEC_FILE_NAME)
 
 package-rpm: clean all install rpmspec rpmbuild
 
-rpmspec: install
-	echo "" > $(SPEC_FILE)
-	echo "Name: $(ARTIFACT_NAME)" >> $(SPEC_FILE)
-	echo "Version: $(SRC_VERSION)" >> $(SPEC_FILE)
-	echo "Release: $(PKG_VERSION)" >> $(SPEC_FILE)
-	echo `svn info |grep '^URL:'` >> $(SPEC_FILE)
-	echo "Packager: $$USER" >> $(SPEC_FILE)
+rpmspec: 
+	echo "" > "$(SPEC_FILE)"
+	"$(ARTIFACT_DIR)/case.sh" all RPM >> "$(SPEC_FILE)"
+	cat "$(ARTIFACT_DIR)/RPM/specfile.spec" >> "$(SPEC_FILE)"
+	for file in "$(ARTIFACT_DIR)/RPM/install_scripts/"*; \
+		do echo "%"$$( basename "$$file" ) >> "$(SPEC_FILE)"; \
+		cat "$$file" >> "$(SPEC_FILE)"; \
+	done
+
+	echo "%description" >> "$(SPEC_FILE)"
+	cat "$(ARTIFACT_DIR)/common/description" >> "$(SPEC_FILE)"
+	echo "" >> "$(SPEC_FILE)"
+
+	echo "%files" >> "$(SPEC_FILE)"
+	# This one command tells rpmbuild to use the file system parameters
+	echo "%defattr(-, -, -, -)" >> "$(SPEC_FILE)"
+
+	echo "$(DOC_DIR)" >> "$(SPEC_FILE)"
+
 	
-	# cat ./$(ARTIFACT_NAME)/pkginfo >> $(SPEC_FILE)
-	cat ./$(ARTIFACT_NAME)/rpm_specific >> $(SPEC_FILE)
-	for file in $(ARTIFACT_NAME)/install_scripts/*; do echo "%"`basename $$file` >> $(SPEC_FILE); cat $$file >> $(SPEC_FILE); done
-	echo "%description" >> $(SPEC_FILE)
-	cat ./$(ARTIFACT_NAME)/description >> $(SPEC_FILE)
-	echo "" >> $(SPEC_FILE)
+	if [ -e "$(INPUT_INST_DIR)" ]; then \
+		echo "$(INPUT_DIR)" >> "$(SPEC_FILE)" ; \
+	fi
 
-	echo "%files" >> $(SPEC_FILE)
+	if [ -e "$(OUTPUT_INST_DIR)" ]; then \
+		echo "$(OUTPUT_DIR)" >> "$(SPEC_FILE)" ; \
+	fi
 
-	# These are created by default
-	echo "%defattr(644, root, root, 755)" >> $(SPEC_FILE)
-	echo "$(DOC_DIR)" >> $(SPEC_FILE)
+	if [ -e "$(LOG_INST_DIR)" ]; then \
+		echo "$(LOG_DIR)" >> "$(SPEC_FILE)" ; \
+	fi
+		
+	# Binaries
+	if [ -e "$(BIN_INST_DIR)" ]; then \
+		echo "$(BIN_DIR)" >> "$(SPEC_FILE)" ; \
+	fi
+
+	# cgi-bin
+	if [ -e "$(CGI_BIN_INST_DIR)" ]; then \
+		echo "$(CGI_BIN_DIR)" >> "$(SPEC_FILE)" ; \
+	fi
 	
-	echo "%defattr(664, root, root, 755) " >> $(SPEC_FILE)
-	echo "$(INPUT_DIR)" >> $(SPEC_FILE)
-	
-	echo "%defattr(664, root, root, 755) " >> $(SPEC_FILE)
-	echo "$(OUTPUT_DIR)" >> $(SPEC_FILE)
-	
-	echo "%defattr(664, root, root, 755) " >> $(SPEC_FILE)
-	echo "$(LOG_DIR)" >> $(SPEC_FILE)
+	# Templates
+	if [ -e "$(TEMPLATE_INST_DIR)" ]; then \
+		echo "$(TEMPLATE_DIR)" >> "$(SPEC_FILE)" ; \
+	fi
 
-# Binaries
-ifneq ("$(wildcard $(SRC_DIR)/bin/*)","")
-	echo "%defattr(755, root, root, 755) " >> $(SPEC_FILE)
-	echo "$(BIN_DIR)" >> $(SPEC_FILE)
-endif
+	# Libraries
+	if [ -e "$(LIB_INST_DIR)" ]; then \
+		echo "$(LIB_DIR)" >> "$(SPEC_FILE)" ; \
+	fi
 
-# cgi-bin
-ifneq ("$(wildcard $(SRC_DIR)/cgi-bin/*)","")
-	echo "%defattr(755, root, root, 755) " >> $(SPEC_FILE)
-	echo "$(CGI_BIN_DIR)" >> $(SPEC_FILE)
-endif
+	# Project Config
+	if [ -e "$(CONF_INST_DIR)" ]; then \
+		echo "%dir $(CONF_DIR)" >> "$(SPEC_FILE)" ; \
+		find "$(CONF_INST_DIR)" -type f \
+		|  sed -r "s|$(ROOT_DIR)|%config(noreplace) |" \
+		 >> "$(SPEC_FILE)" ; \
+	fi
 
-# Templates
-ifneq ("$(wildcard $(SRC_DIR)/templates/*)","")	
-	echo "%defattr(664, root, root, 755) " >> $(SPEC_FILE)
-	echo "$(TEMPLATE_DIR)" >> $(SPEC_FILE)
-endif
 
-# Libraries
-ifneq ("$(wildcard $(SRC_DIR)/lib/*)","")
-	echo "%defattr(644, root, root,755) " >> $(SPEC_FILE)
-	echo "$(LIB_DIR)" >> $(SPEC_FILE)
-endif
+	# /usr/bin
 
-# Project Config, example /opt/IAS/etc/(project-name)
-ifneq ("$(wildcard $(SRC_DIR)/etc/*)","")
-	echo "%defattr(644, root, root,755) " >> $(SPEC_FILE)
-	echo "%dir $(CONF_DIR)" >> $(SPEC_FILE)
-	-find $(ROOT_DIR)/$(CONF_DIR) -type f | sed -r "s|$(ROOT_DIR)|%config |"  >> $(SPEC_FILE)
-endif
+	-for file in $$( find -P "$(ROOT_DIR)/usr/bin/" \( -type l -o -type f \) ); do \
+		echo "$$file" | sed -r "s|$(ROOT_DIR)||" >> "$(SPEC_FILE)" ; \
+	done
 
-ifneq ("$(wildcard $(SRC_DIR)/root_etc/*)","")
-	# /etc/ config files
-	-find $(ROOT_DIR)/etc -type f |  sed -r "s|$(ROOT_DIR)|%config(noreplace) |" >> $(SPEC_FILE)
-endif
+	# end /usr/bin/
 
+	# /etc
+
+	if [ -e "$(ROOT_DIR)/etc" ]; then \
+		find "$(ROOT_DIR)/etc" -type f \
+		| sed -r "s|$(ROOT_DIR)|%config(noreplace) |" \
+		 >> "$(SPEC_FILE)" ; \
+	fi
 
 cp-rpmspec: builddir
-	cp $(ARTIFACT_NAME)/$(SPEC_FILE_NAME) $(SPEC_FILE)
+	cp "$(ARTIFACT_DIR)/$(SPEC_FILE_NAME)" "$(SPEC_FILE)"
 
 rpmbuild:
-	rpmbuild --buildroot $(ROOT_DIR) -bb $(SPEC_FILE) --define '_topdir $(BUILD_DIR)' --define '_rpmtopdir $(BUILD_DIR)'
+	rpmbuild --buildroot "$(ROOT_DIR)" -bb "$(SPEC_FILE)" --define '_topdir $(BUILD_DIR)' --define '_rpmtopdir $(BUILD_DIR)'
+	
+
+.PHONY: debug-package_build-rpm
+
+debug-package_build-rpm:
+	# package_build-rpm - debug variables
+	#  SPEC_FILE_NAME: '$(SPEC_FILE_NAME)'
+	#  SPEC_FILE: '$(SPEC_FILE)'

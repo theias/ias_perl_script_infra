@@ -1,7 +1,0 @@
-Requires: perl-TermReadKey perl-Date-Manip perl-Sys-Syslog perl-Hash-Merge-Simple perl-JSON perl-File-HomeDir
-AutoReqProv: no 
-Summary: An infrastructure framework
-Group: Generic Group
-License: Generic License
-Vendor: Generic Vendor
-BuildArch: noarch

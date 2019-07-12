@@ -1,71 +1,149 @@
-.PHONY: package_install-conditional_additions
+
+SELF_REPLICATING_PARENT_DIR=$(BUILD_DIR)
+SELF_REPLICATING_COPY_DIR=$(ARTIFACT_NAME)-$(RELEASE_VERSION)
+SELF_REPLICATING_FULL_DIR_PATH=$(SELF_REPLICATING_PARENT_DIR)/$(SELF_REPLICATING_COPY_DIR)
+SELF_REPLICATING_TAR_GZ_NAME=$(ARTIFACT_NAME)-$(RELEASE_VERSION).tar.gz
+
 
 # Conditional additions
 
-package_install-conditional_additions: package_install-base_directories
+.PHONY: package_install-conditional_additions-ALL
+
+package_install-conditional_additions-ALL: \
+	package_install-base_directories \
+	package_install-run_scripts \
+	package_install-docs \
+	package_install-bin \
+	package_install-cgi-bin \
+	package_install-templates \
+	package_install-lib \
+	package_install-etc \
+	package_install-root_etc
+
+.PHONY: package_install-self_replication
+package_install-self_replication:
+
+	# Self Replicating
+	# This will put a copy of the source tree in a tar.gz file
+	# in the doc dir.
+	
+	# TODO: ls should not be used this way.
+	# TODO: Maybe move this into a separate make file?
+	
+	mkdir -p "$(SELF_REPLICATING_FULL_DIR_PATH)"
+	ls | egrep -v '(build|\.svn)' | \
+		xargs -n1 -i cp -r {} "$(SELF_REPLICATING_FULL_DIR_PATH)/"
+
+	# This is not ideal, as packages SHOULD be made from a build server from a
+	# new checkout of the tree, and the following things should NOT be there
+
+	# input, output, and log should not get shipped with the tar.gz	
+	-rm -rf "$(SELF_REPLICATING_FULL_DIR_PATH)/src/input"
+	-rm -rf	"$(SELF_REPLICATING_FULL_DIR_PATH)/src/output"
+	-rm -rf "$(SELF_REPLICATING_FULL_DIR_PATH)/src/log"
+	
+	cd "$(SELF_REPLICATING_PARENT_DIR)" && tar czvf "$(SELF_REPLICATING_TAR_GZ_NAME)" \
+		"$(SELF_REPLICATING_COPY_DIR)"
+	
+	# Currently we just put the tar ball into the doc dir; which probably isn't fantastic	
+	mv "$(SELF_REPLICATING_PARENT_DIR)/$(SELF_REPLICATING_TAR_GZ_NAME)" "$(DOC_INST_DIR)"
+
+
+.PHONY: package_install-run_scripts
+package_install-run_scripts:
 
 ifneq ("$(wildcard $(SRC_DIR)/run_scripts/*)","")
 	# Installing run scripts
-	cp -r $(SRC_DIR)/run_scripts $(DOC_INST_DIR)/run_scripts
-	find $(DOC_INST_DIR)/run_scripts -type d | xargs -r chmod 755
-	find $(DOC_INST_DIR)/run_scripts -type f | xargs -r chmod 755
+	cp -r "$(SRC_DIR)/run_scripts" "$(DOC_INST_DIR)/run_scripts"
+	find "$(DOC_INST_DIR)/run_scripts" -type d -exec chmod 755 {} \;
+	find "$(DOC_INST_DIR)/run_scripts" -type f -exec chmod 755 {} \;
 	
 endif
+
+.PHONY: package_install-docs
+package_install-docs:
 
 ifneq ("$(wildcard $(PROJECT_DIR)/doc/*)","") 
 	# Installing more documentation
-	mkdir -p $(DOC_INST_DIR)
-	cp -r $(PROJECT_DIR)/doc $(DOC_INST_DIR)/doc
-	find $(DOC_INST_DIR) -type d | xargs -r chmod 755
-	find $(DOC_INST_DIR) -type f | xargs -r chmod 644
+	mkdir -p "$(DOC_INST_DIR)"
+	cp -r "$(PROJECT_DIR)/doc" "$(DOC_INST_DIR)/doc"
+	find "$(DOC_INST_DIR)" -type d -exec chmod 755 {} \;
+	find "$(DOC_INST_DIR)" -type f -exec chmod 644 {} \;
 endif
+
+.PHONY: package_install-bin
+package_install-bin:
 
 ifneq ("$(wildcard $(SRC_DIR)/bin/*)","") 
 	# Installing binaries.
-	mkdir -p $(ROOT_DIR)/$(BIN_DIR)
-	cp -r $(SRC_DIR)/bin/* $(ROOT_DIR)/$(BIN_DIR)
-	find $(BIN_INST_DIR) -type d | xargs -r chmod 755
-	find $(BIN_INST_DIR) -type f | xargs -r chmod 755
+	mkdir -p "$(ROOT_DIR)/$(BIN_DIR)"
+	cp -r "$(SRC_DIR)/bin/"* "$(ROOT_DIR)/$(BIN_DIR)"
+	find "$(BIN_INST_DIR)" -type d -exec chmod 755 {} \;
+	find "$(BIN_INST_DIR)" -type f -exec chmod 755 {} \;
 
 endif
+
+.PHONY: package_install-cgi-bin
+package_install-cgi-bin:
 
 ifneq ("$(wildcard $(SRC_DIR)/cgi-bin/*)","") 
 	# Installing CGI-BIN files
-	mkdir -p $(ROOT_DIR)/$(CGI_BIN_DIR)
-	-cp -r $(SRC_DIR)/cgi-bin/* $(ROOT_DIR)/$(CGI_BIN_DIR)
-	-find $(CGI_BIN_INST_DIR) -type d | xargs -r chmod 755
-	-find $(CGI_BIN_INST_DIR) -type f | xargs -r chmod 755
-endif
-	
-ifneq ("$(wildcard $(SRC_DIR)/templates/*)","") 
-	# Installing Templates
-	mkdir -p $(TEMPLATE_INST_DIR)
-	cp -r $(SRC_DIR)/templates $(TEMPLATE_INST_DIR)
-	find $(TEMPLATE_INST_DIR) -type d | xargs -r chmod 755
-	find $(TEMPLATE_INST_DIR) -type f | xargs -r chmod 644
+	mkdir -p "$(ROOT_DIR)/$(CGI_BIN_DIR)"
+	-cp -r "$(SRC_DIR)/cgi-bin/"* "$(ROOT_DIR)/$(CGI_BIN_DIR)"
+	-find "$(CGI_BIN_INST_DIR)" -type d -exec chmod 755 {} \;
+	-find "$(CGI_BIN_INST_DIR)" -type f -exec chmod 755 {} \;
 endif
 
-# lib
+.PHONY: package_install-templates
+package_install-templates:
+
+ifneq ("$(wildcard $(SRC_DIR)/templates/*)","") 
+	# Installing Templates
+	mkdir -p "$(TEMPLATE_INST_DIR)"
+	cp -r "$(SRC_DIR)/templates/"* "$(TEMPLATE_INST_DIR)/"
+	find "$(TEMPLATE_INST_DIR)" -type d -exec chmod 755 {} \;
+	find "$(TEMPLATE_INST_DIR)" -type f -exec chmod 644 {} \;
+endif
+
+.PHONY: package_install-lib
+package_install-lib:
+
 ifneq ("$(wildcard $(SRC_DIR)/lib/*)","")	
 	# Installing libraries
-	mkdir -p $(LIB_INST_DIR)
-	cp -r $(SRC_DIR)/lib/* $(LIB_INST_DIR)
-	find $(LIB_INST_DIR) -type d | xargs -r chmod 755
-	find $(LIB_INST_DIR) -type f | xargs -r chmod 644
+	mkdir -p "$(LIB_INST_DIR)"
+	cp -r "$(SRC_DIR)/lib/"* "$(LIB_INST_DIR)"
+	find "$(LIB_INST_DIR)" -type d -exec chmod 755 {} \;
+	find "$(LIB_INST_DIR)" -type f -exec chmod 644 {} \;
 	
 endif
+
+.PHONY: package_install-etc
+package_install-etc:
 
 ifneq ("$(wildcard $(SRC_DIR)/etc/*)","")
 	# Installing project directory configuration
-	mkdir -p $(ROOT_DIR)/$(CONF_DIR)
-	cp -r $(SRC_DIR)/etc/* $(ROOT_DIR)/$(CONF_DIR)/
-	find $(ROOT_DIR)/$(CONF_DIR)/ -type d | xargs -r chmod 755
-	find $(ROOT_DIR)/$(CONF_DIR)/ -type f | xargs -r chmod 644
+	mkdir -p "$(CONF_INST_DIR)"
+	cp -r "$(SRC_DIR)/etc/"* "$(CONF_INST_DIR)/"
+	find "$(CONF_INST_DIR)/" -type d -exec chmod 755 {} \;
+	find "$(CONF_INST_DIR)/" -type f -exec chmod 644 {} \;
 endif
+
+.PHONY: package_install-root_etc
+package_install-root_etc:
 
 ifneq ("$(wildcard $(SRC_DIR)/root_etc/*)","")
 	# Installing things to /etc
-	cp -r $(SRC_DIR)/root_etc $(ROOT_DIR)/etc
-	find $(ROOT_DIR)/etc -type d | xargs -r chmod 755
-	find $(ROOT_DIR)/etc -type f | xargs -r chmod 644
+	cp -r "$(SRC_DIR)/root_etc" "$(ROOT_DIR)/etc"
+	find "$(ROOT_DIR)/etc" -type d -exec chmod 755 {} \;
+	find "$(ROOT_DIR)/etc" -type f -exec chmod 644 {} \;
 endif
+
+.PHONY: debug-package_install-conditional_additions
+
+debug-package_install-conditional_additions:
+	# package_install-conditional_additions - debug variables
+	#   SELF_REPLICATING_PARENT_DIR: '$(SELF_REPLICATING_PARENT_DIR)'
+	#   SELF_REPLICATING_COPY_DIR: '$(SELF_REPLICATING_COPY_DIR)'
+	#   SELF_REPLICATING_FULL_DIR_PATH: '$(SELF_REPLICATING_FULL_DIR_PATH)'
+	#   SELF_REPLICATING_TAR_GZ_NAME: '$(SELF_REPLICATING_TAR_GZ_NAME)'
+

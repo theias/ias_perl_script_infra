@@ -1,16 +1,15 @@
-.PHONY: release self-replicate
+.PHONY: release 
 
 release: test-all
 
-self-replicate: install
-	# Self Replicating
-	# This will put a copy of the source tree in a tar.gz file
-	# in the doc dir.
-	
-	ls | egrep -v '(build|\.svn)' | \
-		xargs -n1 -i cp -r {} ./build/$(ARTIFACT_NAME)-$(RELEASE_VERSION)/
-	
-	cd $(BUILD_DIR) && tar czvf $(ARTIFACT_NAME)-$(RELEASE_VERSION).tar.gz \
-		$(ARTIFACT_NAME)-$(RELEASE_VERSION)
-	
-	mv $(BUILD_DIR)/$(ARTIFACT_NAME)-$(RELEASE_VERSION).tar.gz $(DOC_INST_DIR)/
+.PHONY: package_shell-project_post_create_cleanup
+
+package_shell-project_post_create_cleanup:
+	chmod +x spell_check.sh
+	chmod +x $(ARTIFACT_DIR)/case.sh
+
+.PHONY: debug-package_shell-additional
+
+debug-package_shell-additional:
+	# package_shell-additional - debug variables
+	#   (no variables defined)
