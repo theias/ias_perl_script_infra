@@ -1,3 +1,10 @@
+ias-perl-script-infra 1.9.0-0 noarch; urgency=low
+
+	* Some things for CGI scripts
+	* A wrapper for Net::OpenSSH (IAS::Infra::Net::OpenSSH)
+
+ -- Martin VanWinkle mvanwinkle@ias.edu
+
 ias-perl-script-infra 1.8.0-0 noarch; urgency=low
 
 	* Rebased the package
