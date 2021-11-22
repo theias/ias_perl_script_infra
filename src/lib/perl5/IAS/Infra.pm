@@ -1,3 +1,8 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
 package IAS::Infra;
 
 our @ARGV_COPY;
