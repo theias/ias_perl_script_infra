@@ -111,7 +111,7 @@ package_install-lib:
 ifneq ("$(wildcard $(SRC_DIR)/lib/*)","")	
 	# Installing libraries
 	mkdir -p "$(LIB_INST_DIR)"
-	cp -r "$(SRC_DIR)/lib/"* "$(LIB_INST_DIR)"
+	cp -Lr "$(SRC_DIR)/lib/"* "$(LIB_INST_DIR)"
 	find "$(LIB_INST_DIR)" -type d -exec chmod 755 {} \;
 	find "$(LIB_INST_DIR)" -type f -exec chmod 644 {} \;
 	
