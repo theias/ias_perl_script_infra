@@ -119,9 +119,7 @@ sub say_hello
 	
 	my @names = @{$OPTIONS->{name}};
 	
-	my $name;
-	
-	foreach $name (@names)
+	foreach my $name (@names)
 	{
 		$self->log_info($OPTIONS->{'greeting'} . " $name!");
 	}	
