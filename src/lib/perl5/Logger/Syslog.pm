@@ -90,7 +90,7 @@ Examples:
 
 =cut
 
-sub logger_init(;$)
+sub logger_init(;$) ## no critic
 {
     my ($facility) = @_;
     $facility = $DEFAULT_FACILITY unless defined $facility;
@@ -144,7 +144,7 @@ Example:
 =cut
 
 our $g_rh_prefix = {};
-sub logger_prefix(;$)
+sub logger_prefix(;$) ## no critic
 {
         my ($prefix) = @_;
         $prefix = "" unless defined $prefix;
@@ -177,7 +177,7 @@ Example:
 
 =cut
 
-sub logger_set_default_facility($)
+sub logger_set_default_facility($) ## no critic
 {
     my ($facility) = @_;
     if ($facility ne $DEFAULT_FACILITY) {
@@ -230,7 +230,7 @@ sub AUTOLOAD
     }
 }
 		
-sub log_with_syslog ($$)
+sub log_with_syslog ($$) ## no critic
 {
 	my ($level, $message) = @_;
 	return 0 unless defined $level and defined $message;
