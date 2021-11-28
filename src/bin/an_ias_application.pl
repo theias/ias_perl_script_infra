@@ -110,8 +110,7 @@ sub say_hello
 	
 	my @names=@{$OPTIONS{name}};
 	
-	my $name;
-	foreach $name (@names)
+	foreach my $name (@names)
 	{
 		$self->log_info("Saying hello to $name");
 		$self->log_debug("Number of times: ".$OPTIONS{'times'});
