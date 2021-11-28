@@ -111,12 +111,11 @@ sub log_debug_named
 {
 	my ($self, $names_ar, @msg) = @_;
 	
-	my $element;
 	my @causes;
 	
 	push @causes, 'ALL' if ($DEBUG_NAMES_HASH{'ALL'});
 	
-	foreach $element (@$names_ar)
+	foreach my $element (@$names_ar)
 	{
 		if ($DEBUG_NAMES_HASH{$element})
 		{

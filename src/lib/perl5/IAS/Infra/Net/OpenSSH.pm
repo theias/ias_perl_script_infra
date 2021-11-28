@@ -292,7 +292,7 @@ sub get_username_prompt
 	if (! $self->{'prompt-for-credentials'} )
 	{
 		$self->set_err_msg("I don't have a username, and I was configured to not prompt.");
-		return undef;
+		return;
 	}
 	return $self->simple_stdin_prompt("SSH username: ");
 }
@@ -304,7 +304,7 @@ sub get_password_prompt
 	if (! $self->{'prompt-for-credentials'} )
 	{
 		$self->set_err_msg("I don't have a password, and I was configured to not prompt.");
-		return undef;
+		return;
 	}
 	return $self->simple_stdin_password_prompt("SSH password: ");
 }

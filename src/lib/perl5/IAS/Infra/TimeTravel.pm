@@ -81,7 +81,7 @@ sub fetch_date_wrapper
 {
 	my ($self, $field) = @_;
 	
-	return undef
+	return 
 		if (! $OPTIONS->{$field});
 	
 	my $err;
