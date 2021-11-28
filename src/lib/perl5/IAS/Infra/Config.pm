@@ -198,11 +198,9 @@ sub process_config
 {
 	my ($self, $data) = @_;
 	
-	my $package_name;
-
-	no strict 'refs';
+	no strict 'refs'; ## no critic
 		
-	foreach $package_name (keys %$data)
+	foreach my $package_name (keys %$data)
 	{
 		my $target = "$package_name".'::apply_options_precedence';
 
