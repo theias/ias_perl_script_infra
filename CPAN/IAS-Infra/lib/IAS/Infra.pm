@@ -86,7 +86,13 @@ These modules were designed to help adhere to the following standards:
 
 =back
 
+=head1 VERSION
+
+Version 0.01
+
 =cut
+
+our $VERSION = '0.01';
 
 use base 'IAS::Infra::Logger';
 use base 'IAS::Infra::Hooks';
