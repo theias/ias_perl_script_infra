@@ -1,5 +1,15 @@
 Changes
 lib/IAS/Infra.pm
+lib/IAS/Infra/CGIBinPaths.pm
+lib/IAS/Infra/Config.pm
+lib/IAS/Infra/FullProjectPaths.pm
+lib/IAS/Infra/Hooks.pm
+lib/IAS/Infra/Logger.pm
+lib/IAS/Infra/Net/OpenSSH.pm
+lib/IAS/Infra/NoRun.pm
+lib/IAS/Infra/SimplePrompts.pm
+lib/IAS/Infra/TimeTravel.pm
+
 Makefile.PL
 MANIFEST			This list of files
 README
