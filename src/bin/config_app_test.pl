@@ -130,7 +130,7 @@ sub main_1
 		'c' => 'This was set in '.__PACKAGE__,
 	};
 
-	no strict 'refs';
+	no strict 'refs'; ## no critic
 	my $target = 'IAS::Infra::Config::get_option_ref';
 	my $ptr = \&{$target};
 	
