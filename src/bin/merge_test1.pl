@@ -32,7 +32,7 @@ our %ALLOWED_MAPS = (
 my $manip = 'IAS::test1::get_option_target';
 my $b = 'IAS::test1::OPTIONS';
 
-no strict 'refs';
+no strict 'refs'; ## no critic
 
 # my $ptr=\${$manip};
 
