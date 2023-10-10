@@ -54,13 +54,14 @@ sub get_IAS_infra_home_dir_for_user
 
 }
 
-function get_IAS_infra_home_dir
+sub get_IAS_infra_home_dir
 {
-
-	current_user="$LOGNAME"
+	my $current_user = $ENV{"LOGNAME"}
 	# >&2 printf "Current user: %s\n" "$current_user"
 
-	local wanted_user
+	my $wanted_user;
+
+	
 
 	if [[ -z "$IAS_INFRA_HOME_DIR_TYPE" ]]
 	then
