@@ -10,7 +10,7 @@ my_lib_dir=${my_lib_dir:-"$this_dir/../lib"}
 # End bootstrap
 
 # This dumps some of the variables that are available:
-# debug_test_project_paths
+debug_test_project_paths
 
 # Your tests begin here.  Here's an example.
 # Load the project's bash_lib.sh
