@@ -31,7 +31,6 @@ project_examples_dir=${project_examples_dir:-"$project_dir/examples"}
 function debug_test_project_paths
 {
 cat << EOF
-# this_dir_conf $this_dir_conf
 # test_etc_dir $test_etc_dir
 # test_dir $test_dir
 # test_lib_dir $test_lib_dir
