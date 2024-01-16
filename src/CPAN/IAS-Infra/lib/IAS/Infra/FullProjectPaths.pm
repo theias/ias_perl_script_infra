@@ -225,6 +225,7 @@ my $previous_pass_through;
 		'json-project-config-name=s',
 
 		'bin-dir=s',
+		'lib-dir=s',
 		'conf-dir=s',
 		'root-conf-dir=s',
 		'home-conf-dir=s',
@@ -324,10 +325,12 @@ if($SCRIPT_PATH_PARTS[-2] eq 'src')
 if ($OPTIONS->{'auto-dev-mode'})
 {
 	$OPTIONS->{'root-conf-dir'} ||= $SCRIPT_ABS_PATH."/../root_etc/IAS/$PROJECT_NAME";
+	$OPTIONS->{'lib-dir'} ||= $SCRIPT_ABS_PATH."/../lib/perl5";
 }
 else
 {
 	$OPTIONS->{'root-conf-dir'} ||= "/etc/IAS/$PROJECT_NAME";
+	$OPTIONS->{'lib-dir'} ||= '/opt/IAS/lib/perl5';
 }
 
 use File::HomeDir;
@@ -367,6 +370,7 @@ sub debug_paths
 	$self->log_debug('Chosen Bin: ', $OPTIONS->{'chosen-bin'});
 	$self->log_debug('Default FindBin Chosen Bin: ', $DEFAULT_CHOSEN_BIN);
 	$self->log_debug('Bin dir: ', $self->bin_dir());
+	$self->log_debug('Lib dir: ', $self->lib_dir());
 }
 
 sub project_name
@@ -483,6 +487,12 @@ sub root_conf_dir
 {
 	my ($self) = @_;
 	return $OPTIONS->{'root-conf-dir'};
+}
+
+sub lib_dir
+{
+	my ($self) = @_;
+	return $OPTIONS->{'lib-dir'};
 }
 
 sub conf_dir
