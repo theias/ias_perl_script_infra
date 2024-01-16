@@ -1,0 +1,43 @@
+.PHONY: debug-ALL
+debug-ALL:: debug-base-Makefile 
+
+# 
+BASE_DIR ?= /opt/IAS
+
+
+# package_shell_path ?= $(strip $(dir $(lastword $(MAKEFILE_LIST))))
+# package_shell_main_makefile_path=$(strip $(dir $(lastword $(MAKEFILE_LIST))))
+PACKAGE_SHELL_INCLUDE_PATH=$(package_shell_path)/make
+
+include $(PACKAGE_SHELL_INCLUDE_PATH)/project-base_variables.gmk
+include $(PACKAGE_SHELL_INCLUDE_PATH)/make-standard_phonies.gmk
+
+PROJECT_DIRECTORIES_MAKE_FILE ?= $(PACKAGE_SHELL_INCLUDE_PATH)/project_directories-full_project.gmk
+ifeq ($(PROJECT_DIRECTORIES_ARE_DEFINED),)
+ 	include $(PROJECT_DIRECTORIES_MAKE_FILE)
+endif
+
+include $(PACKAGE_SHELL_INCLUDE_PATH)/package_shell-additional.gmk
+include $(PACKAGE_SHELL_INCLUDE_PATH)/source-basic_tests.gmk
+include $(PACKAGE_SHELL_INCLUDE_PATH)/package_install-base_directories.gmk
+include $(PACKAGE_SHELL_INCLUDE_PATH)/package_install-conditional_additions.gmk
+include $(PACKAGE_SHELL_INCLUDE_PATH)/package_install-code_repository_info.gmk
+include $(PACKAGE_SHELL_INCLUDE_PATH)/package_install-final_cleanup.gmk
+
+include $(PACKAGE_SHELL_INCLUDE_PATH)/package_install-mapped_symbolic_links.gmk
+
+# Supported package systems
+include $(PACKAGE_SHELL_INCLUDE_PATH)/package_build-rpm.gmk
+include $(PACKAGE_SHELL_INCLUDE_PATH)/package_build-deb.gmk
+
+# Basic Linting
+include $(PACKAGE_SHELL_INCLUDE_PATH)/lint-shellcheck.gmk
+
+.PHONY: debug-base-Makefile
+
+debug-base-Makefile::
+	# Makefile - debug variables
+	#   ARTIFACT_BASE_NAME: '$(ARTIFACT_BASE_NAME)'
+	#   ARTIFACT_NAME: '$(ARTIFACT_NAME)'
+	#   package_shell_path: '$(package_shell_path)'
+	#   PACKAGE_SHELL_INCLUDE_PATH: '$(PACKAGE_SHELL_INCLUDE_PATH)'

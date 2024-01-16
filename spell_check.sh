@@ -6,14 +6,15 @@
 
 bin_whence="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
-ASPELL_PROJECT_FILE=$bin_whence/aspell_project.pws
+ASPELL_PROJECT_FILE=${ASPELL_PROJECT_FILE:-"$bin_whence/aspell_project.pws"}
 
 find "$bin_whence" -not -path "./build/*" -type f \
-| egrep -i '(.md)$' \
-| xargs -n1 -i sh -c "aspell --dont-backup --mode=sgml -p $ASPELL_PROJECT_FILE -c \"{}\" < /dev/tty"
+| grep -E -i '(.md)$' \
+| xargs -n1 -i sh -c "aspell --dont-backup --mode=sgml -p \"$ASPELL_PROJECT_FILE\" -c \"{}\" < /dev/tty"
 
 find "$bin_whence" -not -path "./build/*" -type f \
-| egrep -vi '(.md)$' \
-| egrep '.(tex|txt|text)$' \
-| xargs -n1 -i sh -c "aspell --dont-backup -p $ASPELL_PROJECT_FILE -c \"{}\" < /dev/tty"
+| grep -E -vi '(.md)$' \
+| grep -E '.(tex|txt|text)$' \
+| grep -Ev '.(egg-info)' \
+| xargs -n1 -i sh -c "aspell --dont-backup -p \"$ASPELL_PROJECT_FILE\" -c \"{}\" < /dev/tty"
 

@@ -1,0 +1,14 @@
+# 
+BASE_DIR ?= /opt/IAS
+
+
+potential_artifact_name := $(shell basename "$(artifact_makefile_path)")
+ARTIFACT_BASE_NAME ?= $(potential_artifact_name)
+ARTIFACT_NAME ?= $(potential_artifact_name)
+
+USE_AUTOMATION_PERMISSIONS ?= 0
+AUTOMATION_USER ?= iasnetauto
+AUTOMATION_GROUP ?= iasnetauto
+
+PROJECT_DIRECTORIES_MAKEFILE ?= $(PACKAGE_SHELL_INCLUDE_PATH)/project_directories-full_project.gmk
+

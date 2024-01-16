@@ -1,24 +1,22 @@
-SHELL_PWD = $(shell echo `pwd`)
+SHELL_PWD = $(shell pwd)
 
-PROJECT_DIR = $(MAKEFILE_PATH)
+PROJECT_DIR ?= $(shell realpath --no-symlinks '$(package_shell_path)/../')
 
 # (Ideally) this would allow you to cd to any directory
 # and run make from there.
-SCRATCH_AREA = $(SHELL_PWD)
+SCRATCH_AREA ?= $(SHELL_PWD)
 
-ARTIFACT_DIR=$(PROJECT_DIR)/$(ARTIFACT_NAME)
+# ARTIFACT_DIR ?= $(PROJECT_DIR)/artifacts/$(ARTIFACT_NAME)
+ARTIFACT_DIR ?= $(artifact_makefile_path_first_word)
 
 CHANGELOG_FILE = $(ARTIFACT_DIR)/changelog
-RELEASE_VERSION := $(shell cat "$(CHANGELOG_FILE)" | grep -v '^\s+$$' | head -n 1 | awk '{print $$2}')
-ARCH := $(shell cat "$(CHANGELOG_FILE)" | grep -v '^\s+$$' | head -n 1 | awk '{print $$3}'|sed 's/;//')
-SRC_VERSION := $(shell echo '$(RELEASE_VERSION)' | awk -F '-' '{print $$1}')
-PKG_VERSION := $(shell echo '$(RELEASE_VERSION)' | awk -F '-' '{print $$2}')
 
-SRC_DIR = $(PROJECT_DIR)/src
-DROP_DIR = $(SCRATCH_AREA)/drop
-BUILD_BASE_DIR=$(SCRATCH_AREA)/build
-BUILD_DIR = $(BUILD_BASE_DIR)/$(ARTIFACT_NAME)
-ROOT_DIR = $(BUILD_DIR)/root
+SRC_DIR ?= $(PROJECT_DIR)/src
+DROP_DIR ?= $(SCRATCH_AREA)/drop
+BUILD_BASE_DIR ?= $(SCRATCH_AREA)/build
+ARTIFACT_BUILD_BASE_DIR ?= $(BUILD_BASE_DIR)/$(ARTIFACT_NAME)
+BUILD_DIR ?= $(BUILD_BASE_DIR)/$(ARTIFACT_NAME)
+ROOT_DIR ?= $(BUILD_DIR)/root
 
 .PHONY: debug-project-base_variables
 
@@ -30,16 +28,10 @@ debug-project-base_variables:
 	#   ARTIFACT_DIR: '$(ARTIFACT_DIR)'
 	#   SCRATCH_AREA: '$(SCRATCH_AREA)'
 	#
-	#   CHANGELOG_FILE: '$(CHANGELOG_FILE)'
-	#   RELEASE_VERSION: '$(RELEASE_VERSION)'
-	#   ARCH: '$(ARCH)'
-	#   SRC_VERSION: '$(SRC_VERSION)'
-	#   PKG_VERSION: '$(PKG_VERSION)'
-	#   SUMMARY: '$(SUMMARY)'
-	#
 	#   SRC_DIR: '$(SRC_DIR)'
 	#   DROP_DIR: '$(DROP_DIR)'
 	#   BUILD_BASE_DIR: '$(BUILD_BASE_DIR)'
+	#   ARTIFACT_BUILD_BASE_DIR: '$(ARTIFACT_BUILD_BASE_DIR)'
 	#   BUILD_DIR: '$(BUILD_DIR)'
 	#   ROOT_DIR: '$(ROOT_DIR)'
 	#   BASE_DIR: '$(BASE_DIR)'
@@ -47,3 +39,5 @@ debug-project-base_variables:
 	#   USE_AUTOMATION_PERMISSIONS: '$(USE_AUTOMATION_PERMISSIONS)'
 	#   AUTOMATION_USER: '$(AUTOMATION_USER)'
 	#   AUTOMATION_GROUP: '$(AUTOMATION_GROUP)'
+
+debug-ALL:: debug-project-base_variables

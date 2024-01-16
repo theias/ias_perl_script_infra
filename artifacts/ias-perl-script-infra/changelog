@@ -1,3 +1,10 @@
+ias-perl-script-infra 1.10-0-0 noarch; urgency=low
+
+	* Added lib_dir
+	* Rebased package install stuff
+
+ -- Martin VanWinkle (mvanwinkle@ias.edu) Tue, 16 Jan 2024 16:39:25 -0500
+
 ias-perl-script-infra 1.9.0-0 noarch; urgency=low
 
 	* Some things for CGI scripts

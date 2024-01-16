@@ -1,50 +1,72 @@
-.PHONY: package_install-final_cleanup
 
-package_install-final_cleanup:
-	################
+DEFAULT_VAR_CHMOD ?= g+w
+CHMOD_INPUT_DIR ?= $(DEFAULT_VAR_CHMOD)
+CHMOD_OUTPUT_DIR ?= $(DEFAULT_VAR_CHMOD)
+CHMOD_LOG_DIR ?= $(DEFAULT_VAR_CHMOD)
+
+USE_STANDARD_PERMISSIONS ?= 1
+
+.PHONY: package_install-final_cleanup
+package_install-final_cleanup:: \
+	package_install-final_cleanup-subversion \
+	package_install-final_cleanup-python3 \
+	package_install-final_cleanup-perl6 \
+	package_install-final_cleanup-standard_permissions \
+	package_install-final_cleanup-automation_permissions
+
+
+.PHONY: package_install-final_cleanup-standard_permissions
+package_install-final_cleanup-standard_permissions::
+ifeq ($(USE_STANDARD_PERMISSIONS), 1)
 	# Some Final Cleanup	
 	chmod -R a+r "$(ROOT_DIR)"
 	-find "$(ROOT_DIR)" -type d -exec chmod 755 {} \;
+endif
+
+.PHONY: package_install-final_cleanup-subversion
+package_install-final_cleanup-subversion::
 	-find "$(ROOT_DIR)" -type d -name .svn -exec rm -r {} \;
-	
+
+.PHONY: package_install-final_cleanup-perl6
+package_install-final_cleanup-perl6::
+	# Clean up raku / perl6 .precomp files
+	-rm -rf "$(LIB_INST_DIR)/perl6/.precomp"
 	find "$(ROOT_DIR)/$(BASE_DIR)" -maxdepth 1 -type d -exec chmod 755 {} \;
 
+.PHONY: package_install-final_cleanup-python3
+package_install-final_cleanup-python3::
+	# Clean up python stuff
+	-find "$(LIB_INST_DIR)/python3" -type d -name __pycache__ -exec rm -r {} \;
+	-find "$(ROOT_DIR)/$(BASE_DIR)" -type f -name '*.pyc' -exec rm -r {} \;
 	
-	################
-	# An example of creating a file owned by
-	# a non-root user (your system must have
-	# fakeroot installed and working):
-	# touch "$(ROOT_DIR)/drop"
-	# chown somegroup:somegroup "$(ROOT_DIR)/drop"
-
+.PHONY: package_install-final_cleanup-automation_permissions
+package_install-final_cleanup-automation_permissions::
 ifeq ($(USE_AUTOMATION_PERMISSIONS), 1)
 
 	# "Standard" automation directories:
 
 		mkdir -p "$(ROOT_DIR)/$(INPUT_DIR)"
-		chmod 755 "$(ROOT_DIR)/$(INPUT_DIR)"
-		chmod 755 "$(ROOT_DIR)/$(INPUT_BASE_DIR)"
-		
-		mkdir -p "$(ROOT_DIR)/$(OUTPUT_DIR)"
-		chmod 755 "$(ROOT_DIR)/$(OUTPUT_DIR)"
-		chmod 755 "$(ROOT_DIR)/$(OUTPUT_BASE_DIR)"
-		
-		mkdir -p "$(ROOT_DIR)/$(LOG_DIR)"
-		chmod 755 "$(ROOT_DIR)/$(LOG_DIR)"
-		chmod 755 "$(ROOT_DIR)/$(LOG_BASE_DIR)"
-
 		chown $(AUTOMATION_USER):$(AUTOMATION_GROUP) "$(ROOT_DIR)/$(INPUT_DIR)"
-		chmod g+w "$(ROOT_DIR)/$(INPUT_DIR)"
+		chmod "$(CHMOD_INPUT_DIR)" "$(ROOT_DIR)/$(INPUT_DIR)"
 	
+		mkdir -p "$(ROOT_DIR)/$(OUTPUT_DIR)"
 		chown $(AUTOMATION_USER):$(AUTOMATION_GROUP) "$(ROOT_DIR)/$(OUTPUT_DIR)"	
-		chmod g+w "$(ROOT_DIR)/$(OUTPUT_DIR)"
+		chmod "$(CHMOD_OUTPUT_DIR)" "$(ROOT_DIR)/$(OUTPUT_DIR)"
 	
+		mkdir -p "$(ROOT_DIR)/$(LOG_DIR)"
 		chown $(AUTOMATION_USER):$(AUTOMATION_GROUP) "$(ROOT_DIR)/$(LOG_DIR)"
-		chmod g+w "$(ROOT_DIR)/$(LOG_DIR)"
+		chmod "$(CHMOD_LOG_DIR)" "$(ROOT_DIR)/$(LOG_DIR)"
 endif
 	
 .PHONY: debug-package_install-final_cleanup
 
 debug-package_install-final_cleanup:
 	# package_install-final_cleanup - debug variables
-	#   (no variables defined)
+	#   CHMOD_INPUT_DIR: '$(CHMOD_INPUT_DIR)'
+	#   CHMOD_OUTPUT_DIR: '$(CHMOD_OUTPUT_DIR)'
+	#   CHMOD_LOG_DIR: '$(CHMOD_LOG_DIR)'
+    #   USE_STANDARD_PERMISSIONS  '$(USE_STANDARD_PERMISSIONS)'
+    #   USE_AUTOMATION_PERMISSIONS: '$(USE_AUTOMATION_PERMISSIONS)'
+
+debug-ALL:: debug-package_install-final_cleanup
+

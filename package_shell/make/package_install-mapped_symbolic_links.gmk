@@ -1,5 +1,9 @@
 .PHONY: package_install-mapped_symbolic_links 
 
+SYSTEM_BIN_DIR ?= /usr/bin
+SYSTEM_BIN_UP_DIRS ?= $(shell realpath "$(SYSTEM_BIN_DIR)" | sed -e 's|[^/]||g' -e 's|/|../|g')
+SYSTEM_BIN_INST_DIR ?= $(ROOT_DIR)/$(SYSTEM_BIN_DIR)
+
 package_install-mapped_symbolic_links: \
 	package_install-mapped_symbolic_links-usr_bin
 
@@ -10,9 +14,8 @@ package_install-mapped_symbolic_links-usr_bin:
 	for link_me in $(symbolic_links-usr_bin); do \
 		case $$link_me in \
 			*[![:space:]]*) \
-				mkdir -p "$(ROOT_DIR)/usr/bin" ; \
-				echo ln $(BIN_INST_DIR)/$$link_me $(ROOT_DIR)/usr/bin/$$link_me; \
-				ln -s "$(BIN_DIR)/$$link_me" "$(ROOT_DIR)/usr/bin/$$link_me"; \
+				mkdir -p "$(SYSTEM_BIN_INST_DIR)" ; \
+				ln -s "$(SYSTEM_BIN_UP_DIRS)/$(BIN_DIR)/$$link_me" "$(SYSTEM_BIN_INST_DIR)/$$link_me"; \
 			;; \
 			*) \
 				echo "ERROR: Can't symbolically link something that's all whitespace."; \
@@ -26,3 +29,5 @@ package_install-mapped_symbolic_links-usr_bin:
 debug-package_install-mapped_symbolic_links:
 	# package_install-mapped_symbolic_links - debug variables
 	#   symbolc_links-usr_bin: $(symbolic_links-usr_bin)
+
+debug-ALL:: debug-package_install-mapped_symbolic_links

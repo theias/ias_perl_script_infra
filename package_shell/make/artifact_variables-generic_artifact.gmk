@@ -1,0 +1,33 @@
+# If you're going to change ANY of this for the artifact, then
+# copy all of it into the artifact_variables.gmk , and don't change
+# this file.
+# The purpose of this file is to allow artifacts to be
+# generated with a standard set of targets as simply as possible.
+#
+# Also, subsequent releases to package_shell might change how
+# standard package installations happen.
+
+.PHONY: \
+	artifact_all \
+	artifact_test \
+	artifact_debug \
+	artifact_clean \
+	artifact_install \
+	artifact_install-post \
+	artifact_release
+
+artifact_all::
+
+artifact_test::
+ 
+artifact_debug::
+
+artifact_clean:: 
+	-rm -rf "$(ARTIFACT_BUILD_BASE_DIR)"
+
+artifact_install:: \
+	package_install-standard
+
+artifact_install-post::
+
+artifact_release:: package_shell_basic_test-all

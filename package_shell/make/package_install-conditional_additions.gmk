@@ -1,19 +1,30 @@
 
-SELF_REPLICATING_PARENT_DIR=$(BUILD_DIR)
-SELF_REPLICATING_COPY_DIR=$(ARTIFACT_NAME)-$(RELEASE_VERSION)
-SELF_REPLICATING_FULL_DIR_PATH=$(SELF_REPLICATING_PARENT_DIR)/$(SELF_REPLICATING_COPY_DIR)
-SELF_REPLICATING_TAR_GZ_NAME=$(ARTIFACT_NAME)-$(RELEASE_VERSION).tar.gz
+SELF_REPLICATING_PARENT_DIR ?= $(BUILD_DIR)
+SELF_REPLICATING_COPY_DIR ?= $(ARTIFACT_NAME)-$(RELEASE_VERSION)
+SELF_REPLICATING_FULL_DIR_PATH ?= $(SELF_REPLICATING_PARENT_DIR)/$(SELF_REPLICATING_COPY_DIR)
+SELF_REPLICATING_TAR_GZ_NAME ?= $(ARTIFACT_NAME)-$(RELEASE_VERSION).tar.gz
 
+SRC_DIR_RUN_SCRIPTS ?= $(SRC_DIR)/run_scripts
+SRC_DIR_BIN ?= $(SRC_DIR)/bin
+SRC_DIR_WEB ?= $(SRC_DIR)/web
+SRC_DIR_CGI_BIN ?= $(SRC_DIR)/cgi-bin
+SRC_DIR_TEMPLATES ?= $(SRC_DIR)/templates
+SRC_DIR_LIB ?= $(SRC_DIR)/lib
+SRC_DIR_ETC ?= $(SRC_DIR)/etc
+SRC_DIR_ROOT_ETC ?= $(SRC_DIR)/root_etc
+
+PROJECT_DIR_DOC ?= $(PROJECT_DIR)/doc
 
 # Conditional additions
 
 .PHONY: package_install-conditional_additions-ALL
 
-package_install-conditional_additions-ALL: \
+package_install-conditional_additions-ALL:: \
 	package_install-base_directories \
 	package_install-run_scripts \
 	package_install-docs \
 	package_install-bin \
+	package_install-web \
 	package_install-cgi-bin \
 	package_install-templates \
 	package_install-lib \
@@ -21,26 +32,25 @@ package_install-conditional_additions-ALL: \
 	package_install-root_etc
 
 .PHONY: package_install-self_replication
-package_install-self_replication:
+package_install-self_replication::
 
 	# Self Replicating
 	# This will put a copy of the source tree in a tar.gz file
 	# in the doc dir.
-	
-	# TODO: ls should not be used this way.
-	# TODO: Maybe move this into a separate make file?
-	
-	mkdir -p "$(SELF_REPLICATING_FULL_DIR_PATH)"
-	ls | egrep -v '(build|\.svn)' | \
-		xargs -n1 -i cp -r {} "$(SELF_REPLICATING_FULL_DIR_PATH)/"
 
-	# This is not ideal, as packages SHOULD be made from a build server from a
-	# new checkout of the tree, and the following things should NOT be there
+	# Making a copy of the source tree from a non-clean repo
+	# is not a good idea, as transient files should not be included
+	# in the copy.  This rsync attempts to mitigate it by excluding
+	# a list of directories that are transient by the layout's convention
 
-	# input, output, and log should not get shipped with the tar.gz	
-	-rm -rf "$(SELF_REPLICATING_FULL_DIR_PATH)/src/input"
-	-rm -rf	"$(SELF_REPLICATING_FULL_DIR_PATH)/src/output"
-	-rm -rf "$(SELF_REPLICATING_FULL_DIR_PATH)/src/log"
+	rsync -avp \
+	    --exclude .svn/ \
+	    --exclude .git/ \
+	    --exclude build/ \
+	    --exclude src/input \
+	    --exclude src/output \
+	    --exclude src/log \
+	    ./ "$(SELF_REPLICATING_FULL_DIR_PATH)"
 	
 	cd "$(SELF_REPLICATING_PARENT_DIR)" && tar czvf "$(SELF_REPLICATING_TAR_GZ_NAME)" \
 		"$(SELF_REPLICATING_COPY_DIR)"
@@ -50,100 +60,136 @@ package_install-self_replication:
 
 
 .PHONY: package_install-run_scripts
-package_install-run_scripts:
+package_install-run_scripts:: package_install-docs
 
-ifneq ("$(wildcard $(SRC_DIR)/run_scripts/*)","")
+ifneq ("$(wildcard $(SRC_DIR_RUN_SCRIPTS)/*)","")
 	# Installing run scripts
-	cp -r "$(SRC_DIR)/run_scripts" "$(DOC_INST_DIR)/run_scripts"
-	find "$(DOC_INST_DIR)/run_scripts" -type d -exec chmod 755 {} \;
-	find "$(DOC_INST_DIR)/run_scripts" -type f -exec chmod 755 {} \;
+	cp -r "$(SRC_DIR_RUN_SCRIPTS)" "$(DOC_INST_DIR)/run_scripts"
 	
 endif
 
 .PHONY: package_install-docs
-package_install-docs:
+package_install-docs::
 
-ifneq ("$(wildcard $(PROJECT_DIR)/doc/*)","") 
+ifneq ("$(wildcard $(PROJECT_DIR_DOC)/*)","") 
 	# Installing more documentation
 	mkdir -p "$(DOC_INST_DIR)"
-	cp -r "$(PROJECT_DIR)/doc" "$(DOC_INST_DIR)/doc"
-	find "$(DOC_INST_DIR)" -type d -exec chmod 755 {} \;
-	find "$(DOC_INST_DIR)" -type f -exec chmod 644 {} \;
+	cp -r "$(PROJECT_DIR_DOC)/" "$(DOC_INST_DIR)/doc"
 endif
 
-.PHONY: package_install-bin
-package_install-bin:
+	mkdir -p "$(DOC_INST_DIR)"
+	chmod 775 "$(ROOT_DIR)/$(DOC_BASE_DIR)"
+	
+	cp "$(ARTIFACT_DIR)/changelog" "$(DOC_INST_DIR)/"
+	cp "$(ARTIFACT_DIR)/common/description" "$(DOC_INST_DIR)/"
+	cp "$(PROJECT_DIR)/README.md" "$(DOC_INST_DIR)"
 
-ifneq ("$(wildcard $(SRC_DIR)/bin/*)","") 
+
+.PHONY: package_install-bin
+package_install-bin::
+
+ifneq ("$(wildcard $(SRC_DIR_BIN)/*)","") 
 	# Installing binaries.
 	mkdir -p "$(ROOT_DIR)/$(BIN_DIR)"
-	cp -r "$(SRC_DIR)/bin/"* "$(ROOT_DIR)/$(BIN_DIR)"
-	find "$(BIN_INST_DIR)" -type d -exec chmod 755 {} \;
-	find "$(BIN_INST_DIR)" -type f -exec chmod 755 {} \;
+	cp -r "$(SRC_DIR_BIN)/"* "$(ROOT_DIR)/$(BIN_DIR)"
 
+endif
+
+.PHONY: package_install-web
+package_install-web::
+
+ifneq ("$(wildcard $(SRC_DIR_WEB)/*)","")
+	# Installing web files
+	mkdir -p "$(ROOT_DIR)/$(WEB_DIR)"
+	-cp -r "$(SRC_DIR_WEB)/"* "$(ROOT_DIR)/$(WEB_DIR)"
 endif
 
 .PHONY: package_install-cgi-bin
-package_install-cgi-bin:
+package_install-cgi-bin::
 
-ifneq ("$(wildcard $(SRC_DIR)/cgi-bin/*)","") 
+ifneq ("$(wildcard $(SRC_DIR_CGI_BIN)/*)","") 
 	# Installing CGI-BIN files
 	mkdir -p "$(ROOT_DIR)/$(CGI_BIN_DIR)"
-	-cp -r "$(SRC_DIR)/cgi-bin/"* "$(ROOT_DIR)/$(CGI_BIN_DIR)"
-	-find "$(CGI_BIN_INST_DIR)" -type d -exec chmod 755 {} \;
-	-find "$(CGI_BIN_INST_DIR)" -type f -exec chmod 755 {} \;
+	-cp -r "$(SRC_DIR_CGI_BIN)/"* "$(ROOT_DIR)/$(CGI_BIN_DIR)"
 endif
 
 .PHONY: package_install-templates
-package_install-templates:
+package_install-templates::
 
-ifneq ("$(wildcard $(SRC_DIR)/templates/*)","") 
+ifneq ("$(wildcard $(SRC_DIR_TEMPLATES)/*)","") 
 	# Installing Templates
 	mkdir -p "$(TEMPLATE_INST_DIR)"
-	cp -r "$(SRC_DIR)/templates/"* "$(TEMPLATE_INST_DIR)/"
-	find "$(TEMPLATE_INST_DIR)" -type d -exec chmod 755 {} \;
-	find "$(TEMPLATE_INST_DIR)" -type f -exec chmod 644 {} \;
+	cp -r "$(SRC_DIR_TEMPLATES)/"* "$(TEMPLATE_INST_DIR)/"
 endif
 
 .PHONY: package_install-lib
-package_install-lib:
+package_install-lib::
 
-ifneq ("$(wildcard $(SRC_DIR)/lib/*)","")	
+ifneq ("$(wildcard $(SRC_DIR_LIB)/*)","")	
 	# Installing libraries
 	mkdir -p "$(LIB_INST_DIR)"
-	cp -Lr "$(SRC_DIR)/lib/"* "$(LIB_INST_DIR)"
-	find "$(LIB_INST_DIR)" -type d -exec chmod 755 {} \;
-	find "$(LIB_INST_DIR)" -type f -exec chmod 644 {} \;
+	cp -Lr "$(SRC_DIR_LIB)/"* "$(LIB_INST_DIR)"
 	
 endif
 
 .PHONY: package_install-etc
-package_install-etc:
+package_install-etc::
 
-ifneq ("$(wildcard $(SRC_DIR)/etc/*)","")
+ifneq ("$(wildcard $(SRC_DIR_ETC)/*)","")
 	# Installing project directory configuration
 	mkdir -p "$(CONF_INST_DIR)"
-	cp -r "$(SRC_DIR)/etc/"* "$(CONF_INST_DIR)/"
-	find "$(CONF_INST_DIR)/" -type d -exec chmod 755 {} \;
-	find "$(CONF_INST_DIR)/" -type f -exec chmod 644 {} \;
+	cp -r "$(SRC_DIR_ETC)/"* "$(CONF_INST_DIR)/"
 endif
 
 .PHONY: package_install-root_etc
-package_install-root_etc:
+package_install-root_etc::
 
-ifneq ("$(wildcard $(SRC_DIR)/root_etc/*)","")
+ifneq ("$(wildcard $(SRC_DIR_ROOT_ETC)/*)","")
 	# Installing things to /etc
-	cp -r "$(SRC_DIR)/root_etc" "$(ROOT_DIR)/etc"
-	find "$(ROOT_DIR)/etc" -type d -exec chmod 755 {} \;
-	find "$(ROOT_DIR)/etc" -type f -exec chmod 644 {} \;
+	cp -r "$(SRC_DIR_ROOT_ETC)" "$(ROOT_DIR)/etc"
 endif
+
+.PHONY: package_install-example_permissions
+package_install-example_permissions::
+	-find "$(DOC_INST_DIR)" -type d -exec chmod 755 {} \;
+	-find "$(DOC_INST_DIR)" -type f -exec chmod 644 {} \;
+	
+	-find "$(DOC_INST_DIR)/run_scripts" -type d -exec chmod 755 {} \;
+	-find "$(DOC_INST_DIR)/run_scripts" -type f -exec chmod 755 {} \;
+
+	-find "$(BIN_INST_DIR)" -type d -exec chmod 755 {} \;
+	-find "$(BIN_INST_DIR)" -type f -exec chmod 755 {} \;
+
+	-find "$(CGI_BIN_INST_DIR)" -type d -exec chmod 755 {} \;
+	-find "$(CGI_BIN_INST_DIR)" -type f -exec chmod 755 {} \;
+
+	-find "$(LIB_INST_DIR)" -type d -exec chmod 755 {} \;
+	-find "$(LIB_INST_DIR)" -type f -exec chmod 644 {} \;	
+
+	-find "$(CONF_INST_DIR)/" -type d -exec chmod 755 {} \;
+	-find "$(CONF_INST_DIR)/" -type f -exec chmod 644 {} \;
+
+	-find "$(ROOT_DIR)/etc" -type d -exec chmod 755 {} \;
+	-find "$(ROOT_DIR)/etc" -type f -exec chmod 644 {} \;
 
 .PHONY: debug-package_install-conditional_additions
 
-debug-package_install-conditional_additions:
+debug-package_install-conditional_additions::
 	# package_install-conditional_additions - debug variables
 	#   SELF_REPLICATING_PARENT_DIR: '$(SELF_REPLICATING_PARENT_DIR)'
 	#   SELF_REPLICATING_COPY_DIR: '$(SELF_REPLICATING_COPY_DIR)'
 	#   SELF_REPLICATING_FULL_DIR_PATH: '$(SELF_REPLICATING_FULL_DIR_PATH)'
 	#   SELF_REPLICATING_TAR_GZ_NAME: '$(SELF_REPLICATING_TAR_GZ_NAME)'
+	#
+	#   SRC_DIR_RUN_SCRIPTS: '$(SRC_DIR_RUN_SCRIPTS)'
+	#   SRC_DIR_BIN: '$(SRC_DIR_BIN)'
+	#   SRC_DIR_WEB: '$(SRC_DIR_WEB)'
+	#   SRC_DIR_CGI_BIN: '$(SRC_DIR_CGI_BIN)'
+	#   SRC_DIR_TEMPLATES: '$(SRC_DIR_TEMPLATES)'
+	#   SRC_DIR_LIB: '$(SRC_DIR_LIB)'
+	#   SRC_DIR_ETC: '$(SRC_DIR_ETC)'
+	#   SRC_DIR_ROOT_ETC: '$(SRC_DIR_ROOT_ETC)'
+	#	
+	#   PROJECT_DIR_DOC: '$(PROJECT_DIR_DOC)'
 
+debug-ALL:: debug-package_install-conditional_additions

@@ -1,4 +1,7 @@
-BASE_DIR = /opt/IAS
+# 
+BASE_DIR ?= /opt/IAS
+
+
 PROJECT_DIRECTORIES_MAKE_FILE=project_directories-full_project.gmk
 
 # For testing basic package building, we don't

@@ -1,27 +1,9 @@
+
 .PHONY: all clean builddir install
 
 all: artifact_all
 
-clean: project_clean-standard artifact_clean
-
-.PHONY: artifact_all
-artifact_all:
-
-.PHONY: artifact_test
-
-artifact_test:
-
-.PHONY: artifact_debug
-artifact_debug:
-
-.PHONY: artifact_clean
-artifact_clean:
-
-.PHONY: artifact_install
-artifact_install: package_install-standard
-
-.PHONY: artifact_install-post
-artifact_install-post:
+clean: project_clean-standard 
 
 package_install-standard: \
 	package_install-conditional_additions-ALL \
@@ -48,3 +30,4 @@ install: \
 debug-make-standard_phonies: artifact_debug
 	# make-standard_phonies - debug variables
 	#   (no variables defined)
+debug-ALL:: debug-make-standard_phonies

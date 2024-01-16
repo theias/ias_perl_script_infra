@@ -1,69 +1,26 @@
-###########################
-# Advanced Usage below.
-###########################
+package_shell_artifact_gmks = $(wildcard artifacts/*/package_shell.gmk)
+artifact_dirs := $(patsubst %/package_shell.gmk,%,$(package_shell_artifact_gmks))
 
-MAKEFILE_PATH = $(strip $(dir $(firstword $(MAKEFILE_LIST))))
-PACKAGE_SHELL_INCLUDE_PATH=$(MAKEFILE_PATH)/package_shell/make
+package_shell_rpms=$(patsubst %,%.rpm,$(artifact_dirs))
+package_shell_debs=$(patsubst %,%.deb,$(artifact_dirs))
 
-include $(MAKEFILE_PATH)/base.gmk
+.PHONY: debug_main_Makefile
+debug_main_Makefile::
+	# package_shell_artifact_gmks: $(package_shell_artifact_gmks)
+	# artifact_dirs: $(artifact_dirs)
+	# package_shell_rpms: $(package_shell_rpms)
+	# package_shell_debs: $(package_shell_debs)
 
-# The following are optional in base.gmk ,
-# but must be set before the other stuff loads
-ifeq ($(BASE_DIR),)
-	BASE_DIR := /opt/IAS
-endif
+.PHONY: package-rpm
+package-rpm: clean $(package_shell_rpms)
 
+%.rpm: %
+	make -f $</package_shell.gmk package-rpm
 
-include $(PACKAGE_SHELL_INCLUDE_PATH)/project-base_variables.gmk
-include $(PACKAGE_SHELL_INCLUDE_PATH)/make-standard_phonies.gmk
+.PHONY: package-deb
+package-deb: clean $(package_shell_debs)
+%.deb: %
+	make -f $</package_shell.gmk package-deb
 
-ifneq ("$(wildcard $(ARTIFACT_DIR)/artifact_variables.gmk)","")
-	include $(ARTIFACT_DIR)/artifact_variables.gmk
-endif
-
-ifeq ($(PROJECT_DIRECTORIES_MAKE_FILE),)
-	PROJECT_DIRECTORIES_MAKE_FILE:=project_directories-full_project.gmk
-endif
-ifeq ($(PROJECT_DIRECTORIES_ARE_DEFINED),)
-	include $(PACKAGE_SHELL_INCLUDE_PATH)/$(PROJECT_DIRECTORIES_MAKE_FILE)
-	
-endif
-
-include $(PACKAGE_SHELL_INCLUDE_PATH)/package_shell-additional.gmk
-include $(PACKAGE_SHELL_INCLUDE_PATH)/source-basic_tests.gmk
-include $(PACKAGE_SHELL_INCLUDE_PATH)/package_install-base_directories.gmk
-include $(PACKAGE_SHELL_INCLUDE_PATH)/package_install-conditional_additions.gmk
-include $(PACKAGE_SHELL_INCLUDE_PATH)/package_install-code_repository_info.gmk
-include $(PACKAGE_SHELL_INCLUDE_PATH)/package_install-final_cleanup.gmk
-
-include $(PACKAGE_SHELL_INCLUDE_PATH)/package_install-mapped_symbolic_links.gmk
-
-# Supported package systems
-include $(PACKAGE_SHELL_INCLUDE_PATH)/package_build-rpm.gmk
-include $(PACKAGE_SHELL_INCLUDE_PATH)/package_build-deb.gmk
-
-.PHONY: debug-ALL
-
-debug-ALL: \
-	debug-base-Makefile \
-	debug-project-base_variables \
-	debug-make-standard_phonies \
-	debug-project_directories \
-	debug-package_shell-additional \
-	debug-source-basic_tests \
-	debug-package_install-base_directories \
-	debug-package_install-conditional_additions \
-	debug-package_install-final_cleanup \
-	debug-package_build-rpm \
-	debug-package_build-deb \
-	debug-package_install-mapped_symbolic_links \
-	debug-package_install-code_repository_info
-
-.PHONY: debug-base-Makefile
-
-debug-base-Makefile:
-	# Makefile - debug variables
-	#   ARTIFACT_NAME: '$(ARTIFACT_NAME)'
-	#   MAKEFILE_PATH: '$(MAKEFILE_PATH)'
-	#   PACKAGE_SHELL_INCLUDE_PATH: '$(PACKAGE_SHELL_INCLUDE_PATH)'
-	#
+clean:
+	-rm -rf build

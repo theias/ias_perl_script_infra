@@ -1,0 +1,13 @@
+{
+   "project_name" : "ias_perl_script_infra",
+   "project_dir" : "ias_perl_script_infra",
+   "wiki_page" : "",
+   "summary" : "Perl libraries for infrastructure",
+   "BASE_DIR" : "/opt/IAS",
+   "package_name" : "ias-perl-script-infra",
+   "AUTOMATION_USER" : "iasnetauto",
+   "ticket" : "",
+   "AUTOMATION_GROUP" : "iasnetauto",
+   "installed_directory_layout" : "project_directories-full_project.gmk",
+   "USE_AUTOMATION_PERMISSIONS" : 0
+}

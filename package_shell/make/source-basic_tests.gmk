@@ -1,49 +1,66 @@
-.PHONY: test test-all test-doc
+.PHONY: \
+	package_shell_basic_test-all \
+	package_shell_basic_test-syntax \
+	package_shell_basic_test-doc
 
-test-all: test test-doc
+package_shell_basic_test-all: \
+	package_shell_basic_test-syntax \
+	package_shell_basic_test-doc
 
-test:
-	
-	# Sytax checking routines.
-ifneq ("$(wildcard $(SRC_DIR)/bin/*.pl)","")
+package_shell_basic_test-syntax:: \
+	package_shell_basic_test-syntax-perl \
+	package_shell_basic_test-syntax-bash \
+	package_shell_basic_test-syntax-python3 \
+	package_shell_basic_test-syntax-ruby \
+	package_shell_basic_test-syntax-php
+
+package_shell_basic_test-syntax-perl::	
 	# Running Perl Tests
 	find "$(SRC_DIR)/bin" -type f \
 		-name '*.pl' \
-	-exec perl -c {} \; 
+	-print0 | xargs --null -i perl -c '{}' 
 	
-endif
 
-ifneq ("$(wildcard $(SRC_DIR)/bin/*.sh)","")
+package_shell_basic_test-syntax-bash::
 	# Running Bash Tests
 	find "$(SRC_DIR)/bin" -type f \
 		-name '*.sh' \
-	-exec bash -n {} \;
+	-print0 | xargs --null -i bash -n '{}'
 	
-endif
 
-ifneq ("$(wildcard $(SRC_DIR)/bin/*.py)","") 
+package_shell_basic_test-syntax-python3::
 	# Running Python Tests
 	find "$(SRC_DIR)/bin" -type f \
 		-name '*.py' \
-	-exec python -m py_compile {} \;
-endif
+	-print0 | xargs --null -i python3 -m py_compile '{}'
 
-ifneq ("$(wildcard $(SRC_DIR)/bin/*.rb)","")
+package_shell_basic_test-syntax-ruby::
 	# Running Ruby Tests
 	find "$(SRC_DIR)/bin" -type f \
 		-name '*.rb' \
-	-exec ruby -c {} \;
-endif
+	-print0 | xargs --null -i ruby -c '{}'
 
-test-doc:
+package_shell_basic_test-syntax-php::
+	# PHP, when running syntax checks on files doesn't check
+	# files that are included. 
+	# Therefore, find looks for all of the PHP files in the
+	# source tree.
+
+	find "$(SRC_DIR)/" -type f \
+		-name '*.php' \
+	-print0 | xargs --null -i php -n -l '{}'
+
+package_shell_basic_test-doc::
 	# Testing documentation
 	find "$(SRC_DIR)" -type f \
 		-name '*.pl' \
 		-o -name '*.pm' \
 	-exec podchecker {} \;
 
-.PHONY: debug-source-basic_tests
+.PHONY: debug-package_shell_basic_tests
 
-debug-source-basic_tests:
+debug-package_shell_basic_tests::
 	# source-basic_tests - debug variables
 	#   (no variables defined)
+
+debug-ALL:: debug-package_shell_basic_tests

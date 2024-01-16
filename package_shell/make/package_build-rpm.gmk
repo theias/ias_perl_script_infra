@@ -1,5 +1,5 @@
 SPEC_FILE_NAME = $(ARTIFACT_NAME)-$(RELEASE_VERSION)--pkginfo.spec
-SPEC_FILE = $(BUILD_DIR)/$(SPEC_FILE_NAME)
+SPEC_FILE = $(ARTIFACT_BUILD_BASE_DIR)/$(SPEC_FILE_NAME)
 
 .PHONY: \
 	package-rpm \
@@ -7,7 +7,7 @@ SPEC_FILE = $(BUILD_DIR)/$(SPEC_FILE_NAME)
 	cp-rpmspec \
 	rpmbuild
 
-package-rpm: clean all install rpmspec rpmbuild
+package-rpm: artifact_clean all install rpmspec rpmbuild
 
 rpmspec: 
 	echo "" > "$(SPEC_FILE)"
@@ -26,7 +26,9 @@ rpmspec:
 	# This one command tells rpmbuild to use the file system parameters
 	echo "%defattr(-, -, -, -)" >> "$(SPEC_FILE)"
 
-	echo "$(DOC_DIR)" >> "$(SPEC_FILE)"
+	if [ -e "$(DOC_INST_DIR)" ]; then \
+		echo "$(DOC_DIR)" >> "$(SPEC_FILE)" ; \
+	fi
 
 	
 	if [ -e "$(INPUT_INST_DIR)" ]; then \
@@ -44,6 +46,11 @@ rpmspec:
 	# Binaries
 	if [ -e "$(BIN_INST_DIR)" ]; then \
 		echo "$(BIN_DIR)" >> "$(SPEC_FILE)" ; \
+	fi
+
+	# web
+	if [ -e "$(WEB_INST_DIR)" ]; then \
+		echo "$(WEB_DIR)" >> "$(SPEC_FILE)" ; \
 	fi
 
 	# cgi-bin
@@ -70,13 +77,11 @@ rpmspec:
 	fi
 
 
-	# /usr/bin
+	# SYSTEM_BIN_DIR
 
-	-for file in $$( find -P "$(ROOT_DIR)/usr/bin/" \( -type l -o -type f \) ); do \
+	-for file in $$( find -P "$(SYSTEM_BIN_INST_DIR)/" \( -type l -o -type f \) ); do \
 		echo "$$file" | sed -r "s|$(ROOT_DIR)||" >> "$(SPEC_FILE)" ; \
 	done
-
-	# end /usr/bin/
 
 	# /etc
 
@@ -90,7 +95,7 @@ cp-rpmspec: builddir
 	cp "$(ARTIFACT_DIR)/$(SPEC_FILE_NAME)" "$(SPEC_FILE)"
 
 rpmbuild:
-	rpmbuild --buildroot "$(ROOT_DIR)" -bb "$(SPEC_FILE)" --define '_topdir $(BUILD_DIR)' --define '_rpmtopdir $(BUILD_DIR)'
+	rpmbuild --buildroot "$(ROOT_DIR)" -bb "$(SPEC_FILE)" --define '_topdir $(ARTIFACT_BUILD_BASE_DIR)' --define '_rpmtopdir $(ARTIFACT_BUILD_BASE_DIR)'
 	
 
 .PHONY: debug-package_build-rpm
@@ -99,3 +104,5 @@ debug-package_build-rpm:
 	# package_build-rpm - debug variables
 	#  SPEC_FILE_NAME: '$(SPEC_FILE_NAME)'
 	#  SPEC_FILE: '$(SPEC_FILE)'
+
+debug-ALL:: debug-package_build-rpm

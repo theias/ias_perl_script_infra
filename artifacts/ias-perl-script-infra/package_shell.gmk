@@ -1,0 +1,53 @@
+# --- You probably shouldn't need to edit this part.
+# This must come first
+artifact_makefile_path_first_word ?= $(strip $(dir $(firstword $(MAKEFILE_LIST))))
+artifact_makefile_path ?= $(shell realpath --no-symlinks "$(artifact_makefile_path_first_word)" )
+package_shell_path ?= $(shell realpath --no-symlinks "$(artifact_makefile_path)/../../package_shell")
+
+# This is where you could start editing.
+
+# If you don't work at IAS, you can uncomment this line
+# and change it:
+# BASE_DIR ?= /opt/IAS
+
+# This is typically what I use at IAS. 
+IAS_SITE_CONFIG_FILE ?= $(package_shell_path)/site_config/IASv1.gmk
+
+# Set to 1 to enable useful permission settings
+# This creates input, output, and log directories
+# USE_AUTOMATION_PERMISSIONS ?= 0
+# The automation user is set as the owner for those
+# directories:
+# AUTOMATION_USER ?= iasnetauto
+# AUTOMATION_GROUP ?= iasnetauto
+# However, if you would like for other users to use them,
+# you can set the user/group to root, and enable the sticky bit:
+# DEFAULT_VAR_CHMOD ?= +t
+
+# Symbolically link things in src/bin to /usr/bin
+# (you could also use the alternatives system)
+# symbolic_links-usr_bin = \
+#	ias-perl-script-infra_hello.sh \
+# 	another_program.sh
+
+include $(IAS_SITE_CONFIG_FILE)
+include $(package_shell_path)/main.gmk
+
+# Use a generic set of make rules for this artifact.
+#
+# If you want to substantially alter the artifact rules then copy
+# and paste the contents of the below file into this one, and remove the
+# include statement.
+include $(PACKAGE_SHELL_INCLUDE_PATH)/artifact_variables-generic_artifact.gmk
+
+# You can add things by using something:: something_else .
+# Here is an example for adding a lint check to the release target:
+# artifact_release:: lint-shellcheck
+
+.PHONY: artifact_debug
+artifact_debug::
+	# artifact_makefile_path: $(artifact_makefile_path)
+	# package_shell_path: $(package_shell_path)
+	# potential_artifact_name: $(potential_artifact_name)
+	# ARTIFACT_BASE_NAME: $(ARTIFACT_BASE_NAME)
+	# ARTIFACT_NAME: $(ARTIFACT_NAME)

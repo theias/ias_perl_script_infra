@@ -1,3 +1,0 @@
-Depends: libterm-readkey-perl , libdate-manip-perl , liblogger-syslog-perl , libhash-merge-simple-perl , libjson-perl , libfile-homedir-perl
-
-

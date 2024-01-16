@@ -7,7 +7,7 @@ DEB_CONF_FILES_FILE=$(DEB_DIR)/conffiles
 	debsetup \
 	debbuild
 
-package-deb: clean all install debsetup debbuild
+package-deb: artifact_clean all install debsetup debbuild
 
 debsetup:
 	# mkdir -p "$(DEB_DIR)"
@@ -31,7 +31,7 @@ debsetup:
 	
 	
 debbuild:
-	dpkg-deb --build "$(ROOT_DIR)" "$(BUILD_DIR)"
+	dpkg-deb --build "$(ROOT_DIR)" "$(ARTIFACT_BUILD_BASE_DIR)"
 	
 .PHONY: debug-package_build-deb
 
@@ -40,3 +40,5 @@ debug-package_build-deb:
 	#   DEB_DIR: '$(DEB_DIR)'
 	#   DEB_CONTROL_FILE: '$(DEB_CONTROL_FILE)'
 	#   DEB_CONF_FILES_FILE: '$(DEB_CONF_FILES_FILE)'
+
+debug-ALL:: debug-package_build-deb

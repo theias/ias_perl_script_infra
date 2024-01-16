@@ -1,0 +1,7 @@
+.PHONY: project_layout_1-post_create
+
+project_layout_1-post_create:
+	chmod +x spell_check.sh
+	chmod +x artifacts/*/case.sh
+	chmod +x src/bin/*
+	chmod +x tests/bin/*
