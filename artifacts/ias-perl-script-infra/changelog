@@ -1,4 +1,4 @@
-ias-perl-script-infra 1.10-0-0 noarch; urgency=low
+ias-perl-script-infra 1.10.0-0 noarch; urgency=low
 
 	* Added lib_dir
 	* Rebased package install stuff
