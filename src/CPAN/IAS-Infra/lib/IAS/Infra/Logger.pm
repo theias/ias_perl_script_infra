@@ -44,12 +44,15 @@ Assumes the primary logging method will be syslog.
 use strict;
 use warnings;
 
+use Carp qw(cluck carp croak);
 use Getopt::Long;
 use Data::Dumper;
 use Logger::Syslog();
 
 our %DEBUG_NAMES_HASH;
-our $OPTIONS={};
+our $OPTIONS={
+	'log-cluck-bad-message' => 1,
+};
 
 my $LOG_START_TIME = time;
 
@@ -72,6 +75,7 @@ GetOptions(
 	'log-devel!',
 	
 	'log-debug-names=s@',
+	'log-cluck-bad-message!',
 );
 
 }
@@ -105,6 +109,26 @@ if (defined $OPTIONS->{'log-debug-names'})
 {
 	@DEBUG_NAMES_HASH{@{$OPTIONS->{'log-debug-names'}}}
 		= (1) x scalar(@{$OPTIONS->{'log-debug-names'}});
+}
+
+sub log_cluck_bad_message
+{
+	my ($self, @msg) = @_;
+
+	if ($OPTIONS->{'log-cluck-bad-message'})
+	{
+
+
+		if (scalar grep { ! defined $_ } @msg )
+		{
+			cluck "Element of msg was undefined.";
+		}
+
+		if (! scalar @msg)
+		{
+			cluck "No message was passed.";
+		}
+	}
 }
 
 sub log_debug_named
@@ -149,6 +173,8 @@ sub log_debug
 	my $self = shift;
 	my (@msg) = @_;
 
+	$self->log_cluck_bad_message(@msg);
+
 	print $self->get_log_message('DEBUG',@msg)
 		if (
 			$OPTIONS->{'log-debug-stdout'}
@@ -169,13 +195,16 @@ sub log_info
 	my $self = shift;
 	my (@msg) = @_;
 
+	$self->log_cluck_bad_message(@msg);
+
 	if ($OPTIONS->{'log-stdout'} || $OPTIONS->{'log-devel'})
 	{
 		print $self->get_log_message('INFO', @msg);
 	}
-	
+
+
 	my $msg = join(" ", @msg);
-	
+
 	Logger::Syslog::info($msg);
 }
 
@@ -184,6 +213,8 @@ sub log_warning
 	my $self = shift;
 	my (@msg) = @_;
 	
+	$self->log_cluck_bad_message(@msg);
+
 	print STDERR get_log_message('WARNING', @msg)
 		if (
 			$OPTIONS->{'log-stderr'}
@@ -197,6 +228,8 @@ sub log_error
 {
 	my $self = shift;
 	my (@msg) = @_;
+
+	$self->log_cluck_bad_message(@msg);
 	
 	print STDERR get_log_message('ERROR', @msg)
 		if (
@@ -212,6 +245,8 @@ sub log_notice
 	my $self = shift;
 	my (@msg) = @_;
 	
+	$self->log_cluck_bad_message(@msg);
+
 	print STDERR get_log_message('NOTICE', @msg)
 		if (
 			$OPTIONS->{'log-stderr'}
@@ -224,6 +259,8 @@ sub log_notice
 sub log_die
 {
 	my ($self, $exit_code, @msg) = @_;
+
+	$self->log_cluck_bad_message(@msg);
 	
 	$self->log_critic(@msg);
 	
@@ -247,6 +284,8 @@ sub log_critic
 	my $self = shift;
 	my (@msg) = @_;
 	
+	$self->log_cluck_bad_message(@msg);
+
 	print STDERR get_log_message('CRITICAL', @msg)
 		if (
 			$OPTIONS->{'log-stderr'}
@@ -261,6 +300,8 @@ sub log_alert
 	my $self = shift;
 	my (@msg) = @_;
 	
+	$self->log_cluck_bad_message(@msg);
+
 	print STDERR get_log_message('ALERT', @msg)
 		if (
 			$OPTIONS->{'log-stderr'}
@@ -274,6 +315,8 @@ sub log_end_log
 {
 	my ($self, @msg) = @_;
 	
+	$self->log_cluck_bad_message(@msg);
+
 	my $msg = join(" ", @msg, '--ENDING--');
 	$self->log_info($msg);
 }
