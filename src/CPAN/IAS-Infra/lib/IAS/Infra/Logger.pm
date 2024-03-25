@@ -333,6 +333,8 @@ sub log_start_log
 		$SVN_VERSION,
 	) = @_;
 
+	$SVN_VERSION //= '';
+
 	use JSON;
 	my $json_argv = encode_json(\@IAS::Infra::ARGV_COPY);
 
