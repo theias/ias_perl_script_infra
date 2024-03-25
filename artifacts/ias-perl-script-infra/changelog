@@ -1,3 +1,7 @@
+ias-perl-script-infra 1.11.0-0 noarch; urgency=low
+
+	* deps, no complaint if version is not mentioned for logging
+
 ias-perl-script-infra 1.10.0-0 noarch; urgency=low
 
 	* Added lib_dir
