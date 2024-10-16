@@ -1,4 +1,4 @@
-ias-perl-script-infra 1.11.0-1; urgency=low
+ias-perl-script-infra 1.11.0-1 noarch; urgency=low
 
 	* deps , cleaned up a test
 
