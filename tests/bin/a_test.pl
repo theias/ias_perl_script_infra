@@ -7,7 +7,7 @@ use FindBin qw($RealBin);
 use lib "$RealBin/../lib/perl5";
 
 use Data::Dumper;
-use IAS::Tests::FullProject::Paths;
+# use IAS::Tests::FullProject::Paths;
 
-print Dumper($IAS::Tests::FullProject::Paths::PATHS),$/;
+#print Dumper($IAS::Tests::FullProject::Paths::PATHS),$/;
 
