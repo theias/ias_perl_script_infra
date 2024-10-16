@@ -1,3 +1,9 @@
+ias-perl-script-infra 1.11.0-1; urgency=low
+
+	* deps , cleaned up a test
+
+ -- Martin VanWinkle (mvanwinkle@ias.edu) Wed, 16 Oct 2024 11:03:04 -0400
+
 ias-perl-script-infra 1.11.0-0 noarch; urgency=low
 
 	* deps, no complaint if version is not mentioned for logging
